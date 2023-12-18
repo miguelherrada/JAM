@@ -1,6 +1,6 @@
 # JAM
 The Jacobian Analitical Method.
-The Jacobian Analytic Method.
+
 This repository shows examples of application of a numerical method for solving complex non-linear problems[1] in different programming languages (Python, Matlab and Julia).
 
 Reference
