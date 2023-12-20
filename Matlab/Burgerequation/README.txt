@@ -1,0 +1,1 @@
+This JAM example, implemented in matlab, solves the Burger equation described in JAM.pdf.
