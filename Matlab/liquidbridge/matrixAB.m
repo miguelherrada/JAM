@@ -29,7 +29,7 @@
  dpdy=ddy*x0(lp);
  dpdyy=ddy2*x0(lp);
  dpdys=ddsy*x0(lu);
- dpdt0=x0t(lp);
+ dpdt0=x0t(lu);
  lf=3*N+1:4*N;%pointer
  f=x0(lf);
  dfds=dds*x0(lf);
