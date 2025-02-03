@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JAM: Numerical Methods for Curved Spaces</title>
+    <title>JAM: The Jacobian Analytical Method</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -72,27 +72,103 @@
 </head>
 <body>
     <img src="logo.png" alt="JAM Logo" class="logo">
-    <h1>JAM: Numerical Methods for Curved Spaces</h1>
+    <h1>JAM: The Jacobian Analytical Method</h1>
     
-    <p>Welcome to the official page for <strong>JAM</strong>, a numerical framework designed for solving equations in curved spaces.</p>
+    <p>This webpage shows examples of application of a numerical method [1] for solving complex non-linear problems in different programming languages (Python, Matlab, and Julia). In the file "JAM.pdf" the method and its applications are described. The step-by-step implementation of JAM to solve the Burger equation is also explained. The Matlab, Python, and Julia codes for this problem, together with the Matlab and Python codes to study the non-linear oscillations of a liquid bridge, are available in the repository.</p>
 
     <a href="https://github.com/miguelherrada/JAM" class="github-link" target="_blank">
         View on GitHub
     </a>
 
-    <h2>Features</h2>
-    <ul>
-        <li>✅ Symbolic formulation without Christoffel symbols</li>
-        <li>🚀 Independent of the discretization scheme</li>
-        <li>💻 Optimized for computational physics applications</li>
-    </ul>
-
-    <h2>Installation</h2>
-    <pre><code>git clone https://github.com/miguelherrada/JAM.git
-cd JAM
-python setup.py install</code></pre>
-
-    <h2>License</h2>
-    <p>This project is open-source under the MIT License.</p>
+    <h2>Reference</h2>
+    <p>[1] "A numerical method to study the dynamics of capillary fluid systems" MA Herrada, JM Montanero - Journal of Computational Physics, 2016.</p>
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAM: The Jacobian Analytical Method</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .logo {
+            width: 200px;
+            margin: 20px 0;
+            transition: transform 0.3s ease;
+        }
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 2.5em;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            display: grid;
+            gap: 15px;
+        }
+        li {
+            padding: 12px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .github-link {
+            display: inline-block;
+            margin: 20px 0;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white !important;
+            border-radius: 5px;
+        }
+        .github-link:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <img src="logo.png" alt="JAM Logo" class="logo">
+    <h1>JAM: The Jacobian Analytical Method</h1>
+    
+    <p>This webpage shows examples of application of a numerical method [1] for solving complex non-linear problems in different programming languages (Python, Matlab, and Julia). In the file "JAM.pdf" the method and its applications are described. The step-by-step implementation of JAM to solve the Burger equation is also explained. The Matlab, Python, and Julia codes for this problem, together with the Matlab and Python codes to study the non-linear oscillations of a liquid bridge, are available in the repository.</p>
+
+    <a href="https://github.com/miguelherrada/JAM" class="github-link" target="_blank">
+        View on GitHub
+    </a>
+
+    <h2>Reference</h2>
+    <p>[1] "A numerical method to study the dynamics of capillary fluid systems" MA Herrada, JM Montanero - Journal of Computational Physics, 2016.</p>
+</body>
+</html>
+
