@@ -1,4 +1,5 @@
 function[xc,d,d2]=Chevigood(nr,Rout,rin)
+Rout0=Rout-rin;
 %use c,x,dx,dx2,dp,u,v,du
 nr1=nr+1;
 pi=acos(-1.0);
@@ -11,7 +12,7 @@ c(1)=2.0;
 c(nr1)=2.0;
 
 c1=4.0;
-c2=1.0+2.0*(c1/Rout);
+c2=1.0+2.0*(c1/Rout0);
 
 x=zeros(1,nr1);
 xc=zeros(1,nr1);
@@ -22,12 +23,12 @@ d2=zeros(nr1,nr1);
 
 x(1)=1.0;
 xc(1)=rin;
-dx(1)=-2.d0/Rout ;
+dx(1)=-2.d0/Rout0 ;
 	dx2(1)=0.d0;
 for j=1:nr
     x(j+1)=cos((j*pi)/nr);
-    xc(j+1)=rin+0.5d0*(1.d0-x(j+1))*Rout; 
-    dx(j+1)=-2.d0/Rout;
+    xc(j+1)=rin+0.5d0*(1.d0-x(j+1))*Rout0; 
+    dx(j+1)=-2.d0/Rout0;
     dx2(j+1)=0;
 end
 
