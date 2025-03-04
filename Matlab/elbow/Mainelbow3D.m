@@ -9,8 +9,8 @@ restoredefaultpath;
 %path to the analitical Jacobians
 path_jacobian= ['jacobians3D/'];
 path(path,[pwd '/' path_jacobian]);
-%path to the collocation matrices
-path_jacobian1='collocationmatrices/'
+%Collocation matrices
+path_jacobian1= ['../utils/collocationmatrices/'];
 path(path,path_jacobian1)
 
 %% Details of the block, variables
@@ -74,7 +74,7 @@ epsilon=0.001; %epsilon value
 [r0A,dr0A,drr0A]=Chevigood(nrA-1,1,0.001); %eta
 %s  discretization
 nzA=101; %4th order finite differences
-[z0A,dz0A,dzz0A]=finites4th(nzA,pi/2); %s
+[z0A,dz0A,dzz0A]=finites4thsparse(nzA,pi/2); %s
 %theta dervivative
 nx=8; %Fourier collocation points
 [xx,dx] = fourdif(nx,1); %theta

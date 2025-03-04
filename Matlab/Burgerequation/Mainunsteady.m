@@ -1,13 +1,16 @@
-%% Solver JAM (Miguel Ángel Herrada)
-%Example for course in China
+%% JAM example: Burger equation (unsteady) 
 
 %% Initial setup 
 % Lets clean before start and decide where to locate jacobians functions
 % and auxiliary elements
 clear;
 restoredefaultpath;
+%Jacobians
 path_jacobian= ['jacobians/'];
 path(path,path_jacobian)
+%Collocation matrices
+path_jacobian1= ['../utils/collocationmatrices/'];
+path(path,path_jacobian1)
 % number of parameters
 Np = 2; %viscosity, streaching factor
 
@@ -36,7 +39,7 @@ if (lstart==0)
 %domain s [0,1]
 %discretizatiinf of s using ns uniform points and 2th finite differences
 ns=2001;
-[s,ds,dss]=finites2th(ns,1); %ds and dss collocation matrices (1th and 2 second derivatives) [STEP 5]
+[s,ds,dss]=finites2thsparse(ns,1); %ds and dss collocation matrices (1th and 2 second derivatives) [STEP 5]
 %important ds and dss are sparse matrices!
 
 %Init u and g in the 

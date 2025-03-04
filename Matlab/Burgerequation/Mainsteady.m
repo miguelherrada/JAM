@@ -1,13 +1,16 @@
-%% Solver JAM (Miguel Ángel Herrada)
-%Example for course in China
+%% JAM example: Burger equation (steady) 
 
 %% Initial setup 
 % Lets clean before start and decide where to locate jacobians functions
 % and auxiliary elements
 clear;
 restoredefaultpath;
+%Jacobians
 path_jacobian= ['jacobians/'];
 path(path,path_jacobian)
+%Collocation matrices
+path_jacobian1= ['../utils/collocationmatrices/'];
+path(path,path_jacobian1)
 % number of parameters
 Np = 2; %viscosity, streaching factor
 
@@ -116,8 +119,8 @@ for ll=1:1 %this a loop to decrease the diffusivity nu
         
    %% end Newton method
     end
-    toc
-    stop
+
+   
  %making variables readables...
  u=x0(1:ns)';
  g=x0(ns+1:2*ns)';
@@ -127,11 +130,11 @@ for ll=1:1 %this a loop to decrease the diffusivity nu
 x=g(2:ns); %x position
 dx=g(2:ns)-g(1:ns-1); %distance between points
 namef="\nu="+nu
- % subplot(2,1,1); hold on  ;plot(x,dx,'-'); xlabel('x'), ylabel('dx'); box('on')
- % subplot(2,1,2); hold on  ;plot(g,u,'-','Displayname',namef), xlabel('x'), ylabel('u')
+  subplot(2,1,1); hold on  ;plot(x,dx,'-'); xlabel('x'), ylabel('dx'); box('on')
+  subplot(2,1,2); hold on  ;plot(g,u,'-','Displayname',namef), xlabel('x'), ylabel('u')
       
 end
-toc
+
 %saving file
 lsave=0;
 if(lsave==1)
@@ -139,7 +142,7 @@ save('solutions/solutionsteady','x0','pa','ns','s','ds','dss','dt')
 end
 
 %%computing eigenvalue problem
-leigen=1;
+leigen=0;
 if(leigen==1)
  n=30; %number of eigen values
  options.Display='off'

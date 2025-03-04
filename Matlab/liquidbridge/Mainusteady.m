@@ -9,7 +9,9 @@ clear;
 restoredefaultpath;
 path_jacobian= ['jacobians/'];
 path(path,path_jacobian)
-
+%Collocation matrices
+path_jacobian1= ['../utils/collocationmatrices/'];
+path(path,path_jacobian1)
 lset=0 % 1 to compute the Analytical Jacobians
 if (lset==1)
  
@@ -47,7 +49,7 @@ ny=9;%number of y points
 %discretization of s (\eta in the paper) using nx uniform points and 2th finite differences
 ns=61;%number of  s points
 %discretization of s using 4th order finite differences
-[s,ds,ds2]=finitas4th(ns,2*Lambda); 
+[s,ds,ds2]=finites4thsparse(ns,2*Lambda); 
 %Getting the full collocation matrices
 matrixalg_A
 

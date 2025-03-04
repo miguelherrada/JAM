@@ -1,4 +1,4 @@
-function[z,d,d2]=finites4th(nz,H)
+function[z,d,d2]=finitas4th(nz,H)
 z=zeros(1,nz);
 dz=H/(nz-1);
 for j=1:nz
@@ -9,9 +9,12 @@ dx=0.5/dz;
 dx1=1/(12*dz);
 dx2=1/(12*dz^2);
 % Matrix of derivatives
+e1=dx1*ones(nz,1);
+e2=dx2*ones(nz,1);
+d= spdiags([e1 -8*e1 e1*0 8*e1 -e1], -2:2, nz, nz);
+d2= spdiags([-e2 +16*e2 -30*e2 16*e2 -e2], -2:2, nz, nz);
 
-d=zeros(nz,nz);
-d2=zeros(nz,nz);
+
 % -(25*f0 - 48*f_1 + 36*f_2 - 16*f_3 + 3*f_4)/(12*dz)
 d(1,1)=-25*dx1; %4thorder
 d(1,2)=+48*dx1;
@@ -38,22 +41,7 @@ d2(2,4)=4*dx2;
 d2(2,5)=-1*dx2;
 
 
-for j=3:nz-2; %forth order
 
-d(j,j-2)=dx1;
-d(j,j-1)=-8*dx1;
-d(j,j)=0;
-d(j,j+1)=8*dx1;
-d(j,j+2)=-dx1;
-
-
-d2(j,j-2)=-dx2;
-d2(j,j-1)=16*dx2;
-d2(j,j)=-30*dx2;
-d2(j,j+1)=16*dx2;
-d2(j,j+2)=-dx2;
-
-end
  %(10*f0 + 3*f_1 - 18*f_2 + 6*f_3 - f_4)/(12*dz)
 d(nz-1,nz-4)=-1*dx1; 
 d(nz-1,nz-3)=+6*dx1; 
