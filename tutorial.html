@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>JAM Tutorial</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <style>
+            body { padding-top: 70px; background-color: #f8f9fa; }
+            h1 { color: #007acc; }
+            h2 { color: #005f99; }
+            a.btn { margin-top: 20px; }
+            .ref-link { color: #3498db; text-decoration: underline; }
+        </style>
+    </head>
+<body>
+    <!-- Navbar común -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html"><img src="logo.png" alt="JAM Logo" width="100"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="tutorial.html">Tutorial</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://github.com/miguelherrada/JAM" target="_blank">GitHub</a></li>
+                    <li class="nav-item"><a class="nav-link" href="JAM.pdf" target="_blank">Paper</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido del tutorial -->
+    <div class="container">
+        <h1 class="mt-4">Welcome to the JAM Tutorial</h1>
+        <p class="lead">This tutorial provides a comprehensive, step-by-step explanation of the JAM code’s functionality. You’ll need Matlab or a Python compiler installed to run or modify the examples.</p>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">Contents</h2>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><a href="#introduction"><i class="fas fa-book"></i> Introduction to JAM</a></li>
+                    <li class="list-group-item"><a href="#setup"><i class="fas fa-cogs"></i> Setting up the Environment</a></li>
+                    <li class="list-group-item"><a href="#examples"><i class="fas fa-code"></i> Running Examples in Matlab and Python</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 id="introduction" class="card-title">Introduction to JAM</h2>
+                <p>The Jacobian Analytical Method (JAM) is an advanced computational framework designed to efficiently solve complex non-linear problems, particularly those involving flows with free interfaces or moving boundaries. Originally developed by <a href="bibliography.html#ref2016" class="ref-link">Herrada and Montanero (2016)</a>, JAM stands out for its ability to map intricate physical domains to rectangular spaces via non-singular transformations, simplifying both non-linear analysis and linear stability studies of capillary systems and other fluid dynamics problems.</p>
+                <p>What makes JAM unique is its focus on the symbolic computation of analytical Jacobians, eliminating the need for costly numerical approximations or the traditional use of Christoffel symbols to handle curvature in non-Euclidean spaces. This approach, refined in a recent work (<a href="bibliography.html#ref2024" class="ref-link">Herrada, 2024</a>), allows physical laws to be applied directly in Cartesian coordinates, even in curved domains, enhancing accuracy and reducing computational time.</p>
+                <p>Key features of JAM include:</p>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Analytical Jacobian Computation:</strong> Utilizes symbolic tools to derive Jacobians with high precision, minimizing numerical errors.</li>
+                    <li class="list-group-item"><strong>Computational Optimization:</strong> Combines sparse collocation matrices with analytical Jacobians to assemble the numerical Jacobian matrix, speeding up Newton-Raphson iterations.</li>
+                    <li class="list-group-item"><strong>Extreme Flexibility:</strong> Enables the construction of generalized eigenvalue problems to study the global stability of non-linear systems, adapting to diverse applications from capillary fluids to viscoelasticity.</li>
+                    <li class="list-group-item"><strong>Avoids Christoffel Symbols:</strong> Simplifies formulation in curved spaces by projecting equations into Euclidean space, easing implementation and scalability.</li>
+                </ul>
+                <p>JAM is particularly valuable in fields like fluid dynamics, where problems with free interfaces—such as liquid bridges, gravitational jets, or the breakup of viscoelastic threads—demand high precision and efficiency. Through this tutorial, you will learn how to implement JAM in Matlab or Python using practical examples available in the <a href="https://github.com/miguelherrada/JAM">JAM GitHub repository</a>. Get ready to discover a powerful tool that will transform your approach to numerical simulation!</p>
+            </div>
+        </div>
+
+        <!-- Secciones adicionales (Setup y Examples) -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 id="setup" class="card-title">Setting up the Environment</h2>
+                <p>Instructions for setting up Matlab or Python to run JAM examples will go here. Ensure you have the necessary dependencies installed as outlined in the GitHub repository.</p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 id="examples" class="card-title">Running Examples in Matlab and Python</h2>
+                <p>Step-by-step examples demonstrating how to execute JAM code will be detailed here. Refer to the repository for sample scripts.</p>
+            </div>
+        </div>
+
+        <a href="index.html" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Back to main page</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+</body>
+</html>
