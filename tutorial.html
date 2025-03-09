@@ -70,7 +70,83 @@
         <div class="card mb-4">
             <div class="card-body">
                 <h2 id="setup" class="card-title">Setting up the Environment</h2>
-                <p>Instructions for setting up Matlab or Python to run JAM examples will go here. Ensure you have the necessary dependencies installed as outlined in the GitHub repository.</p>
+                <p>To run the JAM examples, you need to set up your environment with either Matlab or Python. Below are detailed instructions for installing and configuring both options, including the necessary dependencies.</p>
+        
+                <h3>Matlab Setup</h3>
+                <p>Matlab requires a valid license to use. If you don’t have Matlab installed, follow these steps:</p>
+                <ol>
+                    <li>Download and install Matlab from the official MathWorks website: <a href="https://www.mathworks.com/products/matlab.html" target="_blank">https://www.mathworks.com/products/matlab.html</a>.</li>
+                    <li>During installation, ensure you include the following toolboxes:
+                        <ul>
+                            <li><strong>Symbolic Math Toolbox</strong> – Required for symbolic computation in JAM.</li>
+                            <li><strong>Optimization Toolbox</strong> – Essential for optimization tasks in JAM examples.</li>
+                        </ul>
+                    </li>
+                    <li>After installation, verify that these toolboxes are enabled. You can check this in Matlab by navigating to "Home" > "Add-Ons" > "Manage Add-Ons".</li>
+                </ol>
+                
+        
+                <h3>Python Setup</h3>
+                <p>Python is a free, open-source alternative to Matlab. Below are instructions for installing Python, an IDE, and the required libraries on Windows 11 and Ubuntu.</p>
+        
+                <h4>Windows 11</h4>
+                <ol>
+                    <li><strong>Install Python:</strong>
+                        <ul>
+                            <li>Download the latest stable version of Python from <a href="https://www.python.org/downloads/" target="_blank">https://www.python.org/downloads/</a>.</li>
+                            <li>Run the installer and ensure you check the box labeled "Add Python to PATH" to make Python accessible from the command line.</li>
+                            <li>Complete the installation by following the on-screen instructions.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Install Visual Studio Code (IDE):</strong>
+                        <ul>
+                            <li>Download Visual Studio Code from <a href="https://code.visualstudio.com/" target="_blank">https://code.visualstudio.com/</a>.</li>
+                            <li>Run the installer and follow the prompts to complete the installation.</li>
+                            <li>Open Visual Studio Code, go to the Extensions view (Ctrl+Shift+X), search for "Python", and install the official Python extension by Microsoft.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Install Required Libraries:</strong>
+                        <ul>
+                            <li>Open a terminal in Visual Studio Code (Terminal > New Terminal) or use the Command Prompt.</li>
+                            <li>Run the following command to install the necessary libraries:
+                                <pre><code>pip install numpy sympy scipy matplotlib</code></pre>
+                            </li>
+                            
+                        </ul>
+                    </li>
+                </ol>
+        
+                <h4>Ubuntu</h4>
+                <ol>
+                    <li><strong>Install Python:</strong>
+                        <ul>
+                            <li>Open a terminal and run the following commands to update your system and install Python along with pip:
+                                <pre><code>sudo apt update
+        sudo apt install python3 python3-pip</code></pre>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>Install Visual Studio Code (IDE):</strong>
+                        <ul>
+                            <li>Visual Studio Code is available on Ubuntu via the Snap package manager. Install it by running:
+                                <pre><code>sudo snap install --classic code</code></pre>
+                            </li>
+                            <li>Open Visual Studio Code, go to the Extensions view (Ctrl+Shift+X), search for "Python", and install the official Python extension by Microsoft.</li>
+                            <li><strong>Alternative:</strong> If you prefer another IDE, you can install PyCharm Community Edition with:
+                                <pre><code>sudo snap install pycharm-community --classic</code></pre>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>Install Required Libraries:</strong>
+                        <ul>
+                            <li>In the terminal, run the following command to install the necessary libraries:
+                                <pre><code>pip3 install numpy sympy scipy matplotlib</code></pre>
+                            </li>
+                        </ul>
+                    </li>
+                </ol>
+        
+                <p>With Matlab or Python set up as described above, you’ll have all the tools and dependencies needed to run the JAM examples from the <a href="https://github.com/miguelherrada/JAM">GitHub repository</a>.</p>
             </div>
         </div>
 
