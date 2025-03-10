@@ -1,10 +1,17 @@
 import pickle
+import os
+import sys
 import numpy as np
 import scipy.sparse as sp
 from scipy.sparse import spdiags, csc_matrix, hstack, vstack
 import matplotlib.pyplot as plt
 import sympy as sym
-from colocationmatrices import colocation
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(os.path.join(parent_dir, 'utils/collocationmatrices'))
+
+
+import collocation
 from plot_elbow_geometry import generate_elbow_geometry, plot_elbow_geometry, plot_solution
 from Matrices3d import matrices3D
 from utils import initial_guess_x0, inverse_initial_guess_x0, computingpointersF, fix_result
@@ -51,17 +58,17 @@ DFAAt_func = [sym.lambdify(symbolic_vars, expr, 'numpy') for expr in loaded_data
 nrA = 4  # Number of Chebyshev collocation points in eta
 epsilon = 0.001
 r0A = np.linspace(0, 1, nrA)
-r0A, dr0A, drr0A = colocation.Chevigood(nrA - 1, 1.0, 0.001)
+r0A, dr0A, drr0A = collocation.Chevigood(nrA - 1, 1.0, 0.001)
 
 # Discretization in s (4th order finite differences)
 nzA = 101
 z0A = np.linspace(0, np.pi/2, nzA)
-z0A, dz0A, dzz0A = colocation.finites4th(nzA, np.pi/2)
+z0A, dz0A, dzz0A = collocation.finites4th(nzA, np.pi/2)
 
 # Discretization in theta (Fourier collocation)
 nxA = 8  # Fourier collocation points
-xxA, dxA = colocation.fourdif(nxA, 1)
-xxA, dxxA = colocation.fourdif(nxA, 2)
+xxA, dxA = collocation.fourdif(nxA, 1)
+xxA, dxxA = collocation.fourdif(nxA, 2)
 
 # Compute boundary pointers (using Fortran order)
 l_l, l_r, l_t, l_b = computingpointersF(nrA, nzA, nxA)

@@ -1,4 +1,18 @@
 #importing from phyton...
+import os
+import sys
+
+# Obtener el directorio actual (elbow)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Subir un nivel para llegar al directorio Python
+parent_dir = os.path.dirname(current_dir)
+
+# Agregar el directorio collocationmatrices a sys.path
+sys.path.append(os.path.join(parent_dir, 'utils/collocationmatrices'))
+
+# Ahora puedes importar el módulo collocation
+import collocation
 import numpy as np
 import pickle
 import sympy as sp
@@ -16,8 +30,6 @@ from scipy.sparse import hstack, vstack
 from scipy.optimize import fsolve
 import time
 import warnings
-#importing from my files...
-from colocationmatrices import colocation #all the collocation matrices
 import auxilarfunctions
 # Ignora las advertencias de tiempo de ejecución
 warnings.filterwarnings("ignore", category=RuntimeWarning)
@@ -104,9 +116,9 @@ ny =int(9)  #in the y direction (\eta in the paper)
 #total number of spatial points
 Np=ns*ny
 #y-collocation matrices (spectral)
-y, dy, dyy =colocation.Chevigood(ny-1, 1.0,0.)
+y, dy, dyy =collocation.Chevigood(ny-1, 1.0,0.)
 #s-collocation matrices (4th finite differences)
-s, ds, dss =colocation.finites4th(ns, 2.*Lambda)
+s, ds, dss =collocation.finites4th(ns, 2.*Lambda)
 #s, ds, dss =collocacion.Chevigood(ns-1, 2.*Lambda,0)
 #s-collocation matrices (4th finite differences)
 
