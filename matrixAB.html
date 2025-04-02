@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      -->
+<title>Computing the Jacobian matrix and the right-hand side vector</title>
+<meta name="generator" content="MATLAB 23.2">
+<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
+<meta name="DC.date" content="2025-03-26">
+<meta name="DC.source" content="matrixAB.m">
+<style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style>
+</head>
+<body>
+<div class="content">
+<h1>Computing the Jacobian matrix and the right-hand side vector</h1>
+<!--introduction-->
+<!--/introduction-->
+<h2>Contents</h2>
+<div>
+<ul>
+<li>
+<a href="#1">Compute time derivative coefficients</a>
+</li>
+<li>
+<a href="#2">Store variable values and derivatives</a>
+</li>
+<li>
+<a href="#3">Compute analytical Jacobians</a>
+</li>
+<li>
+<a href="#4">Assemble system matrices</a>
+</li>
+</ul>
+</div>
+<h2 id="1">Compute time derivative coefficients</h2>
+<pre class="codeinput">dt2 = dt1 + dt;
+bm = -(dt2/dt) / (dt2-dt); <span class="comment">% Backward coefficient</span>
+bmm = (dt/dt2) / (dt2-dt); <span class="comment">% Backward-backward coefficient</span>
+bp = -((dt2/dt)^2 - 1) / ((dt2/dt)*(dt-dt2)); <span class="comment">% Present coefficient</span>
+xt = bp * x0full + bm * x0mfull + bmm * x0mmfull; <span class="comment">% Time derivative</span>
+</pre>
+<h2 id="2">Store variable values and derivatives</h2>
+<pre class="codeinput">yfA = zeros(NVA, NDA, ntA); <span class="comment">% Initialize</span>
+<span class="keyword">for</span> i = 1:NVA
+    indices = JMfull{i};
+    variable = x0full(indices);
+    yfA(i, 1, :) = variable; <span class="comment">% Value</span>
+    yfA(i, 2, :) = ddr0v{i} * variable; <span class="comment">% Radial derivative</span>
+    yfA(i, 3, :) = ddz0v{i} * variable; <span class="comment">% Axial derivative</span>
+    yfA(i, 4, :) = ddrr0v{i} * variable; <span class="comment">% Second radial derivative</span>
+    yfA(i, 5, :) = ddzz0v{i} * variable; <span class="comment">% Second axial derivative</span>
+    yfA(i, 6, :) = ddzr0v{i} * variable; <span class="comment">% Mixed derivative</span>
+    yfA(i, 7, :) = xt(indices); <span class="comment">% Time derivative</span>
+<span class="keyword">end</span>
+</pre>
+<h2 id="3">Compute analytical Jacobians</h2>
+<pre class="codeinput">[FAA, DFAA] = evaluatingMatrices(nrA, nzA, pa, z0A, r0A, yfA, NVA, NDA, ndA, X1, Y1, X2, Y2);
+</pre>
+<h2 id="4">Assemble system matrices</h2>
+<pre class="codeinput">ablock = cell(NVA, NVA); xablock = cell(NVA, 1); <span class="comment">% Initialize blocks</span>
+<span class="keyword">for</span> j = 1:NVA
+    C = FAA(j, :);
+    xablock{j} = -PMNv{j} * C'; <span class="comment">% Right-hand side</span>
+    <span class="keyword">for</span> k = 1:NVA
+        km = (k-1)*NDA + 1; kp = k*NDA;
+        C_block = squeeze(DFAA(j, km:kp, :));
+        B = spdiags(C_block(1,:)', 0, ntA, ntA) + <span class="keyword">...</span><span class="comment"> % Assemble Jacobian block</span>
+            spdiags(C_block(2,:)', 0, ntA, ntA) * ddr0v{k} + <span class="keyword">...</span>
+            spdiags(C_block(3,:)', 0, ntA, ntA) * ddz0v{k} + <span class="keyword">...</span>
+            spdiags(C_block(4,:)', 0, ntA, ntA) * ddrr0v{k} + <span class="keyword">...</span>
+            spdiags(C_block(5,:)', 0, ntA, ntA) * ddzz0v{k} + <span class="keyword">...</span>
+            spdiags(C_block(6,:)', 0, ntA, ntA) * ddzr0v{k} + <span class="keyword">...</span>
+            spdiags(C_block(7,:)', 0, ntA, ntA) * bp;
+        ablock{j, k} = sparse(PMNv{j} * B * PNMv{k}); <span class="comment">% Sparse block</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+a = cell2mat(ablock); <span class="comment">% System matrix</span>
+b = cell2mat(xablock); <span class="comment">% Right-hand side</span>
+</pre>
+<p class="footer">
+<br>
+<a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2023b</a>
+<br>
+</p>
+</div>
+<!--
+##### SOURCE BEGIN #####
+%% Computing the Jacobian matrix and the right-hand side vector
+
+%% Compute time derivative coefficients
+dt2 = dt1 + dt;
+bm = -(dt2/dt) / (dt2-dt); % Backward coefficient
+bmm = (dt/dt2) / (dt2-dt); % Backward-backward coefficient
+bp = -((dt2/dt)^2 - 1) / ((dt2/dt)*(dt-dt2)); % Present coefficient
+xt = bp * x0full + bm * x0mfull + bmm * x0mmfull; % Time derivative
+
+%% Store variable values and derivatives
+yfA = zeros(NVA, NDA, ntA); % Initialize
+for i = 1:NVA
+    indices = JMfull{i};
+    variable = x0full(indices);
+    yfA(i, 1, :) = variable; % Value
+    yfA(i, 2, :) = ddr0v{i} * variable; % Radial derivative
+    yfA(i, 3, :) = ddz0v{i} * variable; % Axial derivative
+    yfA(i, 4, :) = ddrr0v{i} * variable; % Second radial derivative
+    yfA(i, 5, :) = ddzz0v{i} * variable; % Second axial derivative
+    yfA(i, 6, :) = ddzr0v{i} * variable; % Mixed derivative
+    yfA(i, 7, :) = xt(indices); % Time derivative
+end
+
+%% Compute analytical Jacobians
+[FAA, DFAA] = evaluatingMatrices(nrA, nzA, pa, z0A, r0A, yfA, NVA, NDA, ndA, X1, Y1, X2, Y2);
+
+%% Assemble system matrices
+ablock = cell(NVA, NVA); xablock = cell(NVA, 1); % Initialize blocks
+for j = 1:NVA
+    C = FAA(j, :);
+    xablock{j} = -PMNv{j} * C'; % Right-hand side
+    for k = 1:NVA
+        km = (k-1)*NDA + 1; kp = k*NDA;
+        C_block = squeeze(DFAA(j, km:kp, :));
+        B = spdiags(C_block(1,:)', 0, ntA, ntA) + ... % Assemble Jacobian block
+            spdiags(C_block(2,:)', 0, ntA, ntA) * ddr0v{k} + ...
+            spdiags(C_block(3,:)', 0, ntA, ntA) * ddz0v{k} + ...
+            spdiags(C_block(4,:)', 0, ntA, ntA) * ddrr0v{k} + ...
+            spdiags(C_block(5,:)', 0, ntA, ntA) * ddzz0v{k} + ...
+            spdiags(C_block(6,:)', 0, ntA, ntA) * ddzr0v{k} + ...
+            spdiags(C_block(7,:)', 0, ntA, ntA) * bp;
+        ablock{j, k} = sparse(PMNv{j} * B * PNMv{k}); % Sparse block
+    end
+end
+a = cell2mat(ablock); % System matrix
+b = cell2mat(xablock); % Right-hand side
+##### SOURCE END #####
+-->
+</body>
+</html>

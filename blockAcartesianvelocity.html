@@ -1,0 +1,516 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      -->
+<title>blockAcartesianvelocity</title>
+<meta name="generator" content="MATLAB 24.1">
+<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
+<meta name="DC.date" content="2025-04-02">
+<meta name="DC.source" content="blockAcartesianvelocity.m">
+<style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style>
+</head>
+<body>
+<div class="content">
+<h2>Contents</h2>
+<div>
+<ul>
+<li>
+<a href="#1">Setting equations of Block B</a>
+</li>
+<li>
+<a href="#2">Maping 3D Euclidean</a>
+</li>
+<li>
+<a href="#3">Selecting vector basis: cartesinan e_x=[1,0,0] e_y=[0,1,0] e_z=[0,0,1]</a>
+</li>
+<li>
+<a href="#4">Velocites operators</a>
+</li>
+<li>
+<a href="#5">Momentum equations in Euclidean space (equation (17) in the paper)</a>
+</li>
+<li>
+<a href="#6">Continuity equation (equation (16) in the paper)</a>
+</li>
+<li>
+<a href="#7">Replacing simbolic by real variables</a>
+</li>
+<li>
+<a href="#8">Bulk</a>
+</li>
+<li>
+<a href="#9">Boundary conditions</a>
+</li>
+<li>
+<a href="#10">Mounting vectors and jacobian tensors</a>
+</li>
+</ul>
+</div>
+<h2 id="1">Setting equations of Block B</h2>
+<pre class="codeinput">
+<span class="comment">%number of variables</span>
+NVAR = NVA;
+<span class="comment">%number of derivatice</span>
+NDER = NDA;
+
+
+<span class="comment">%velocities cartesians u (vx) w( vz)   v(vy) entrance: z=0 z0=0</span>
+<span class="comment">%w=Poiseuille)</span>
+syms <span class="string">u(r0,z0,t0,time)</span> <span class="string">w(r0,z0,t0,time)</span>  <span class="string">v(r0,z0,t0,time)</span> <span class="string">p(r0,z0,t0,time)</span> <span class="comment">%mapping functions</span>
+
+<span class="comment">%Mapping variables r0= \eta z0=s, t0=\theta</span>
+assume (r0,<span class="string">"real"</span>)
+assume (z0,<span class="string">"real"</span>)
+assume (t0,<span class="string">"real"</span>)
+
+<span class="comment">% Parametric equations for the volume of the tube (see equation (15))</span>
+<span class="comment">%X:</span>
+F = (cos(z0)*(2*L - pi*r0*cos(t0)))/pi;
+<span class="comment">%Z:</span>
+H = (sin(z0)*(2*L - pi*r0*cos(t0)))/pi;
+G = -r0*sin(t0);
+
+u=u(r0,z0,t0,time);
+w=w(r0,z0,t0,time);
+v=v(r0,z0,t0,time);
+p=p(r0,z0,t0,time);
+</pre>
+<h2 id="2">Maping 3D Euclidean</h2>
+<pre class="codeinput">X=[F,G,H]; <span class="comment">%x,y,z</span>
+<span class="comment">%X=[r0*cos(t0),r0*sin(t0),z0];</span>
+<span class="comment">%X=[r0,z0,t0];</span>
+xs=[r0,z0,t0];
+JX=jacobian(X,xs); <span class="comment">%Jacobian matrix</span>
+Jinv=inv(JX);  <span class="comment">%inverse Jacobian matrix</span>
+Jinv=simplify(Jinv);
+</pre>
+<h2 id="3">Selecting vector basis: cartesinan e_x=[1,0,0] e_y=[0,1,0] e_z=[0,0,1]</h2>
+<pre class="codeinput">
+<span class="comment">%temporal mapping</span>
+syms <span class="string">dr0dtime0</span>  <span class="string">dz0dtime0</span>  <span class="string">dt0dtime0</span> <span class="string">real</span>
+x=X(1);
+y=X(2);
+z=X(3);
+eqn1 = diff(x,time) +diff(x,z0)*dz0dtime0 +diff(x,r0)*dr0dtime0+diff(x,t0)*dt0dtime0==0;
+eqn2 = diff(y,time) +diff(y,z0)*dz0dtime0 +diff(y,r0)*dr0dtime0+diff(y,t0)*dt0dtime0==0;
+eqn3 = diff(z,time) +diff(z,z0)*dz0dtime0 +diff(z,r0)*dr0dtime0+diff(z,t0)*dt0dtime0==0;
+ [Aeqn,Beqn]=equationsToMatrix([eqn1,eqn2,eqn3],[dr0dtime0,dz0dtime0,dt0dtime0]);
+Xeqn=linsolve(Aeqn,Beqn);
+dr0dtime0=simplify(Xeqn(1));
+dz0dtime0=simplify(Xeqn(2));
+dt0dtime0=simplify(Xeqn(3));
+
+<span class="comment">% Cartesian velocity (base bbase)</span>
+U3D=[u,v,w];
+<span class="comment">%Euclides derivatives</span>
+
+<span class="comment">%first derivatives</span>
+dU3Ddx=Jinv(1,1)*diff(U3D,xs(1))+Jinv(2,1)*diff(U3D,xs(2))+Jinv(3,1)*diff(U3D,xs(3));
+dU3Ddy=Jinv(1,2)*diff(U3D,xs(1))+Jinv(2,2)*diff(U3D,xs(2))+Jinv(3,2)*diff(U3D,xs(3));
+dU3Ddz=Jinv(1,3)*diff(U3D,xs(1))+Jinv(2,3)*diff(U3D,xs(2))+Jinv(3,3)*diff(U3D,xs(3));
+dpdx=Jinv(1,1)*diff(p,xs(1))+Jinv(2,1)*diff(p,xs(2))+Jinv(3,1)*diff(p,xs(3));
+dpdy=Jinv(1,2)*diff(p,xs(1))+Jinv(2,2)*diff(p,xs(2))+Jinv(3,2)*diff(p,xs(3));
+dpdz=Jinv(1,3)*diff(p,xs(1))+Jinv(2,3)*diff(p,xs(2))+Jinv(3,3)*diff(p,xs(3));
+
+
+<span class="comment">%second</span>
+dU3Ddxx=Jinv(1,1)*diff(dU3Ddx,xs(1))+Jinv(2,1)*diff(dU3Ddx,xs(2))+Jinv(3,1)*diff(dU3Ddx,xs(3));
+dU3Ddyy=Jinv(1,2)*diff(dU3Ddy,xs(1))+Jinv(2,2)*diff(dU3Ddy,xs(2))+Jinv(3,2)*diff(dU3Ddy,xs(3));
+dU3Ddzz=Jinv(1,3)*diff(dU3Ddz,xs(1))+Jinv(2,3)*diff(dU3Ddz,xs(2))+Jinv(3,3)*diff(dU3Ddz,xs(3));
+</pre>
+<h2 id="4">Velocites operators</h2>
+<pre class="codeinput">
+<span class="comment">%gradient U in cartesians</span>
+gradientU3D=[dU3Ddx.',dU3Ddy.',dU3Ddz.'];
+<span class="comment">%Ugradient</span>
+UgradientU3D=w*zeros(1,3);
+<span class="keyword">for</span> i=1:3
+UgradientU3D(i)=simplify(U3D(1)*dU3Ddx(i)+U3D(2)*dU3Ddy(i)+U3D(3)*dU3Ddz(i));
+<span class="keyword">end</span>
+<span class="comment">%laplace operator</span>
+laplaceU3D=simplify(dU3Ddxx+dU3Ddyy+dU3Ddzz);
+<span class="comment">%gradient (p)</span>
+gradientp3D=[dpdx,dpdy,dpdz];
+<span class="comment">%gradientp3D=simplify(gradientp3D);</span>
+<span class="comment">%divergence of the velocity filed</span>
+diverU3D=simplify(dU3Ddx(1)+dU3Ddy(2)+dU3Ddz(3));
+
+<span class="comment">%time derivative</span>
+dUdtime3D=diff(U3D,time)+diff(U3D,r0)*dr0dtime0+diff(U3D,z0)*dz0dtime0<span class="keyword">...</span>
++diff(U3D,t0)*dt0dtime0;
+</pre>
+<h2 id="5">Momentum equations in Euclidean space (equation (17) in the paper)</h2>
+<pre class="codeinput">MX=(dUdtime3D+UgradientU3D)+gradientp3D-laplaceU3D/Re;
+
+Eq1=MX(1); <span class="comment">%x Momentum</span>
+Eq2=MX(2); <span class="comment">%y Momentum</span>
+Eq3=MX(3); <span class="comment">%z Momentum</span>
+</pre>
+<h2 id="6">Continuity equation (equation (16) in the paper)</h2>
+<pre class="codeinput">Eq4=diverU3D;
+</pre>
+<h2 id="7">Replacing simbolic by real variables</h2>
+<pre class="codeinput">dimension = 2;
+<span class="keyword">for</span> k=1:NVAR  <span class="comment">%variable</span>
+    <span class="keyword">for</span> i=1:NDER  <span class="comment">%derivatives</span>
+        <span class="comment">% We create an array of symbolic variables, _yfA_</span>
+        <span class="comment">%real</span>
+        yFA(k,i)=sym([ <span class="string">'yFA'</span>,<span class="string">'v'</span>,num2str(k),<span class="string">'d'</span>,num2str(i)],<span class="string">'real'</span>);
+
+    <span class="keyword">end</span>
+    tco = list_var_A {k};
+    [bas nto] = size(tco);
+    list_variables {k} = tco(1:nto-1);
+<span class="keyword">end</span>
+list_derivatives = list_der;
+
+
+
+<span class="keyword">for</span> k=1:NVAR
+    name=[<span class="string">'yFAsym(k,1)='</span> list_varsymbolic{k} <span class="string">';'</span>];
+  eval(name)
+
+<span class="keyword">for</span> i=2:NDER
+name=[<span class="string">'yFAsym(k,i)=diff('</span> list_varsymbolic{k},list_dersymbolic{i}     <span class="string">';'</span>];
+eval(name);
+<span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">%equations bulk</span>
+<span class="keyword">for</span> k=1:NVAR
+<span class="keyword">for</span> i=NDER:-1:1
+Eq1=subs(Eq1,yFAsym(k,i),yFA(k,i));
+Eq2=subs(Eq2,yFAsym(k,i),yFA(k,i));
+Eq3=subs(Eq3,yFAsym(k,i),yFA(k,i));
+Eq4=subs(Eq4,yFAsym(k,i),yFA(k,i));
+<span class="keyword">end</span>
+<span class="keyword">end</span>
+
+
+<span class="comment">%getting explicit expressions for the derivatives and functions</span>
+<span class="keyword">for</span> k=1:NVAR
+    eval([list_variables{k} list_derivatives{1} <span class="string">' = yFA(k,1);'</span>]);
+<span class="keyword">for</span> i=2:NDER
+eval([<span class="string">'d'</span> list_variables{k} <span class="string">'d'</span> list_derivatives{i} <span class="string">' = yFA(k,i);'</span>]);
+<span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre>
+<h2 id="8">Bulk</h2>
+<pre class="codeinput">  FAA(1)=Eq1;
+  FAA(2)=Eq2;
+  FAA(3)=Eq3;
+  FAA(4)=Eq4;
+</pre>
+<h2 id="9">Boundary conditions</h2>
+<pre class="codeinput">
+<span class="comment">%wall top: eta=1</span>
+FAAt(1)=u;
+FAAt(2)=v;
+FAAt(3)=w;
+FAAt(4)=dpdr0;
+
+<span class="comment">%entrance left: s=0</span>
+FAAl(1)=u;
+FAAl(2)=v ;
+FAAl(3)=w-2*(1-r0^2);
+FAAl(4)=dpdz0;
+
+<span class="comment">%outflow rigth: s=1</span>
+FAAr(1)=dudz0;
+FAAr(2)=dvdz0 ;
+FAAr(3)=dwdz0;
+FAAr(4)=p;
+</pre>
+<h2 id="10">Mounting vectors and jacobian tensors</h2>
+<pre class="codeinput">x=reshape(yFA',NVAR*NDER,1); <span class="comment">%variables</span>
+<span class="comment">% Jacobians</span>
+<span class="keyword">for</span> k=1:NVAR
+dFAA(k,:)=jacobian(FAA(k),x);
+dFAAt(k,:)=jacobian(FAAt(k),x);
+dFAAr(k,:)=jacobian(FAAr(k),x);
+dFAAl(k,:)=jacobian(FAAl(k),x);
+<span class="keyword">end</span>
+
+<span class="comment">%saving functions</span>
+matlabFunction(FAA ,dFAA, <span class="string">'file'</span>,[path_jacobian <span class="string">'equationFAA.m'</span> ],<span class="string">'vars'</span>,{z0,r0,t0,x,pa});
+matlabFunction(FAAr,dFAAr,<span class="string">'file'</span>,[path_jacobian <span class="string">'equationFAAr.m'</span>],<span class="string">'vars'</span>,{z0,r0,t0,x,pa});
+matlabFunction(FAAl,dFAAl,<span class="string">'file'</span>,[path_jacobian <span class="string">'equationFAAl.m'</span>],<span class="string">'vars'</span>,{z0,r0,t0,x,pa});
+matlabFunction(FAAt,dFAAt,<span class="string">'file'</span>,[path_jacobian <span class="string">'equationFAAt.m'</span>],<span class="string">'vars'</span>,{z0,r0,t0,x,pa});
+</pre>
+<p class="footer">
+<br>
+<a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2024a</a>
+<br>
+</p>
+</div>
+<!--
+##### SOURCE BEGIN #####
+%% Setting equations of Block B
+%number of variables
+NVAR = NVA;
+%number of derivatice
+NDER = NDA;
+
+
+%velocities cartesians u (vx) w( vz)   v(vy) entrance: z=0 z0=0
+%w=Poiseuille)
+syms u(r0,z0,t0,time) w(r0,z0,t0,time)  v(r0,z0,t0,time) p(r0,z0,t0,time) %mapping functions
+
+%Mapping variables r0= \eta z0=s, t0=\theta 
+assume (r0,"real")
+assume (z0,"real")
+assume (t0,"real")
+
+% Parametric equations for the volume of the tube (see equation (15))
+%X:
+F = (cos(z0)*(2*L - pi*r0*cos(t0)))/pi;
+%Z:
+H = (sin(z0)*(2*L - pi*r0*cos(t0)))/pi;
+G = -r0*sin(t0);
+
+u=u(r0,z0,t0,time);
+w=w(r0,z0,t0,time);
+v=v(r0,z0,t0,time);
+p=p(r0,z0,t0,time);
+
+%% Maping 3D Euclidean 
+X=[F,G,H]; %x,y,z
+%X=[r0*cos(t0),r0*sin(t0),z0];
+%X=[r0,z0,t0];
+xs=[r0,z0,t0];
+JX=jacobian(X,xs); %Jacobian matrix
+Jinv=inv(JX);  %inverse Jacobian matrix
+Jinv=simplify(Jinv);
+
+%% Selecting vector basis: cartesinan e_x=[1,0,0] e_y=[0,1,0] e_z=[0,0,1]
+%temporal mapping
+syms dr0dtime0  dz0dtime0  dt0dtime0 real
+x=X(1);
+y=X(2);
+z=X(3);
+eqn1 = diff(x,time) +diff(x,z0)*dz0dtime0 +diff(x,r0)*dr0dtime0+diff(x,t0)*dt0dtime0==0;
+eqn2 = diff(y,time) +diff(y,z0)*dz0dtime0 +diff(y,r0)*dr0dtime0+diff(y,t0)*dt0dtime0==0;
+eqn3 = diff(z,time) +diff(z,z0)*dz0dtime0 +diff(z,r0)*dr0dtime0+diff(z,t0)*dt0dtime0==0;
+ [Aeqn,Beqn]=equationsToMatrix([eqn1,eqn2,eqn3],[dr0dtime0,dz0dtime0,dt0dtime0]);
+Xeqn=linsolve(Aeqn,Beqn);
+dr0dtime0=simplify(Xeqn(1));
+dz0dtime0=simplify(Xeqn(2));
+dt0dtime0=simplify(Xeqn(3));
+
+% Cartesian velocity (base bbase)
+U3D=[u,v,w];
+%Euclides derivatives
+
+%first derivatives
+dU3Ddx=Jinv(1,1)*diff(U3D,xs(1))+Jinv(2,1)*diff(U3D,xs(2))+Jinv(3,1)*diff(U3D,xs(3));
+dU3Ddy=Jinv(1,2)*diff(U3D,xs(1))+Jinv(2,2)*diff(U3D,xs(2))+Jinv(3,2)*diff(U3D,xs(3));
+dU3Ddz=Jinv(1,3)*diff(U3D,xs(1))+Jinv(2,3)*diff(U3D,xs(2))+Jinv(3,3)*diff(U3D,xs(3));
+dpdx=Jinv(1,1)*diff(p,xs(1))+Jinv(2,1)*diff(p,xs(2))+Jinv(3,1)*diff(p,xs(3));
+dpdy=Jinv(1,2)*diff(p,xs(1))+Jinv(2,2)*diff(p,xs(2))+Jinv(3,2)*diff(p,xs(3));
+dpdz=Jinv(1,3)*diff(p,xs(1))+Jinv(2,3)*diff(p,xs(2))+Jinv(3,3)*diff(p,xs(3));
+
+
+%second
+dU3Ddxx=Jinv(1,1)*diff(dU3Ddx,xs(1))+Jinv(2,1)*diff(dU3Ddx,xs(2))+Jinv(3,1)*diff(dU3Ddx,xs(3));
+dU3Ddyy=Jinv(1,2)*diff(dU3Ddy,xs(1))+Jinv(2,2)*diff(dU3Ddy,xs(2))+Jinv(3,2)*diff(dU3Ddy,xs(3));
+dU3Ddzz=Jinv(1,3)*diff(dU3Ddz,xs(1))+Jinv(2,3)*diff(dU3Ddz,xs(2))+Jinv(3,3)*diff(dU3Ddz,xs(3));
+
+
+
+%% Velocites operators
+
+%gradient U in cartesians
+gradientU3D=[dU3Ddx.',dU3Ddy.',dU3Ddz.'];
+%Ugradient
+UgradientU3D=w*zeros(1,3);
+for i=1:3
+UgradientU3D(i)=simplify(U3D(1)*dU3Ddx(i)+U3D(2)*dU3Ddy(i)+U3D(3)*dU3Ddz(i));
+end
+%laplace operator
+laplaceU3D=simplify(dU3Ddxx+dU3Ddyy+dU3Ddzz);
+%gradient (p)
+gradientp3D=[dpdx,dpdy,dpdz];
+%gradientp3D=simplify(gradientp3D);
+%divergence of the velocity filed
+diverU3D=simplify(dU3Ddx(1)+dU3Ddy(2)+dU3Ddz(3));
+
+%time derivative
+dUdtime3D=diff(U3D,time)+diff(U3D,r0)*dr0dtime0+diff(U3D,z0)*dz0dtime0...
++diff(U3D,t0)*dt0dtime0;
+
+
+
+
+
+
+
+%% Momentum equations in Euclidean space (equation (17) in the paper)
+MX=(dUdtime3D+UgradientU3D)+gradientp3D-laplaceU3D/Re;
+
+Eq1=MX(1); %x Momentum
+Eq2=MX(2); %y Momentum
+Eq3=MX(3); %z Momentum
+
+%% Continuity equation (equation (16) in the paper)
+Eq4=diverU3D; 
+
+%% Replacing simbolic by real variables
+dimension = 2;
+for k=1:NVAR  %variable
+    for i=1:NDER  %derivatives
+        % We create an array of symbolic variables, _yfA_
+        %real
+        yFA(k,i)=sym([ 'yFA','v',num2str(k),'d',num2str(i)],'real');
+       
+    end
+    tco = list_var_A {k};
+    [bas nto] = size(tco);
+    list_variables {k} = tco(1:nto-1);
+end
+list_derivatives = list_der;
+
+
+
+for k=1:NVAR
+    name=['yFAsym(k,1)=' list_varsymbolic{k} ';'];
+  eval(name)  
+    
+for i=2:NDER    
+name=['yFAsym(k,i)=diff(' list_varsymbolic{k},list_dersymbolic{i}     ';'];
+eval(name);
+end
+end
+
+%equations bulk
+for k=1:NVAR
+for i=NDER:-1:1    
+Eq1=subs(Eq1,yFAsym(k,i),yFA(k,i));
+Eq2=subs(Eq2,yFAsym(k,i),yFA(k,i));
+Eq3=subs(Eq3,yFAsym(k,i),yFA(k,i));
+Eq4=subs(Eq4,yFAsym(k,i),yFA(k,i));
+end
+end
+
+
+%getting explicit expressions for the derivatives and functions
+for k=1:NVAR
+    eval([list_variables{k} list_derivatives{1} ' = yFA(k,1);']);
+for i=2:NDER    
+eval(['d' list_variables{k} 'd' list_derivatives{i} ' = yFA(k,i);']);
+end
+end
+
+  
+  %% Bulk 
+  FAA(1)=Eq1;  
+  FAA(2)=Eq2;
+  FAA(3)=Eq3; 
+  FAA(4)=Eq4;  
+
+%% Boundary conditions
+
+%wall top: eta=1
+FAAt(1)=u;
+FAAt(2)=v;
+FAAt(3)=w;
+FAAt(4)=dpdr0;
+
+%entrance left: s=0
+FAAl(1)=u;
+FAAl(2)=v ;
+FAAl(3)=w-2*(1-r0^2);
+FAAl(4)=dpdz0;
+
+%outflow rigth: s=1
+FAAr(1)=dudz0;
+FAAr(2)=dvdz0 ;
+FAAr(3)=dwdz0;
+FAAr(4)=p;
+
+
+%% Mounting vectors and jacobian tensors
+
+x=reshape(yFA',NVAR*NDER,1); %variables
+% Jacobians 
+for k=1:NVAR
+dFAA(k,:)=jacobian(FAA(k),x);
+dFAAt(k,:)=jacobian(FAAt(k),x);
+dFAAr(k,:)=jacobian(FAAr(k),x);
+dFAAl(k,:)=jacobian(FAAl(k),x);
+end
+
+%saving functions
+matlabFunction(FAA ,dFAA, 'file',[path_jacobian 'equationFAA.m' ],'vars',{z0,r0,t0,x,pa});
+matlabFunction(FAAr,dFAAr,'file',[path_jacobian 'equationFAAr.m'],'vars',{z0,r0,t0,x,pa});
+matlabFunction(FAAl,dFAAl,'file',[path_jacobian 'equationFAAl.m'],'vars',{z0,r0,t0,x,pa});
+matlabFunction(FAAt,dFAAt,'file',[path_jacobian 'equationFAAt.m'],'vars',{z0,r0,t0,x,pa});
+
+##### SOURCE END #####
+-->
+</body>
+</html>

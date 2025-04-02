@@ -35,7 +35,7 @@ JX=jacobian(X,xs); %Jacobian matrix
 Jinv=inv(JX);  %inverse Jacobian matrix
 Jinv=simplify(Jinv);
 
-%% selecting vector basis: cartesinan e_x=[1,0,0] e_y=[0,1,0] e_z=[0,0,1]
+%% Selecting vector basis: cartesinan e_x=[1,0,0] e_y=[0,1,0] e_z=[0,0,1]
 %temporal mapping
 syms dr0dtime0  dz0dtime0  dt0dtime0 real
 x=X(1);
@@ -70,7 +70,7 @@ dU3Ddzz=Jinv(1,3)*diff(dU3Ddz,xs(1))+Jinv(2,3)*diff(dU3Ddz,xs(2))+Jinv(3,3)*diff
 
 
 
-%% velocites operators
+%% Velocites operators
 
 %gradient U in cartesians
 gradientU3D=[dU3Ddx.',dU3Ddy.',dU3Ddz.'];
@@ -104,15 +104,13 @@ Eq1=MX(1); %x Momentum
 Eq2=MX(2); %y Momentum
 Eq3=MX(3); %z Momentum
 
-%% Continuity equation (equatin (16) in the paper)
+%% Continuity equation (equation (16) in the paper)
 Eq4=diverU3D; 
 
+%% Replacing simbolic by real variables
 dimension = 2;
-
-%Replacing simbolic by real variables
 for k=1:NVAR  %variable
     for i=1:NDER  %derivatives
-        %%
         % We create an array of symbolic variables, _yfA_
         %real
         yFA(k,i)=sym([ 'yFA','v',num2str(k),'d',num2str(i)],'real');
@@ -155,10 +153,8 @@ eval(['d' list_variables{k} 'd' list_derivatives{i} ' = yFA(k,i);']);
 end
 end
 
-
-%creating analythical functions 
   
-  %bulk 
+  %% Bulk 
   FAA(1)=Eq1;  
   FAA(2)=Eq2;
   FAA(3)=Eq3; 
@@ -186,11 +182,8 @@ FAAr(4)=p;
 
 
 %% Mounting vectors and jacobian tensors
-%
 
 x=reshape(yFA',NVAR*NDER,1); %variables
-
-%%
 % Jacobians 
 for k=1:NVAR
 dFAA(k,:)=jacobian(FAA(k),x);

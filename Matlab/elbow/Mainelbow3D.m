@@ -1,24 +1,18 @@
-%% JAM example II of the article 
-%% "Goodbye Christoffel Symbols: A Flexible and Efficient Approach for Solving Physical Problems in Curved Spaces"
-%% bty Miguel A. Herrada
+%% JAM example II of the article "Goodbye Christoffel Symbols: A Flexible and Efficient Approach for Solving Physical Problems in Curved Spaces" by Miguel A. Herrada
 
-%% Flow in a Bent Cylindrical Tube
-
-clear all;
+%% Initial Setup
+clear all;% Clear workspace
 restoredefaultpath;
-%path to the analitical Jacobians
-path_jacobian= ['jacobians3D/'];
-path(path,[pwd '/' path_jacobian]);
+path_jacobian= ['jacobians3D/'];% Restore default MATLAB paths
+path(path,[pwd '/' path_jacobian]);% Path for Jacobian functions
 %Collocation matrices
-path_jacobian1= ['../utils/collocationmatrices/'];
+path_jacobian1= ['../utils/collocationmatrices/'];% Path for collocation matrices
 path(path,path_jacobian1)
 
-%% Details of the block, variables
+%% Problem Configuration
 
-%%
 % Number of parameters:
 Np = 2; %  Re and L
- 
 % List of blocks
 list_block = {'A' };
 %List of variables: Cartesian velocity filed V=[v_x,v_y,v_z] and pressure
@@ -44,7 +38,7 @@ for i=1:nbl
 end
 
 
- %%  Compute symbolic functions and construction of matrix.m
+ %% Compute symbolic functions
 lset=0  %If lset=1 we compile the equations
 if(lset==1)
 
@@ -57,16 +51,14 @@ L=pa(2); %legnt of the pipe (timesx radius)
 blockAcartesianvelocity 
 end
 
-
-  
-%%Control parameters
+%%  Domain Discretization 
+%Control parameters
 %Reynolds number
 Re=0.0001;
 %Dimensionless length of the tube
 L=10;
 pa=[Re;L];
    
-
 %\eta discretization
 nrA=8; %number Chebyshev spectral collocation points in\theta
 epsilon=0.001; %epsilon value
@@ -93,15 +85,12 @@ rA=repmat(r0A', [1 nzA nx]);
 %full collocation matrices
 [ddr0A,ddrr0A,ddz0A,ddzz0A,ddx0A,ddxx0A,ddrz0A,ddzx0A,ddrx0A]= matrices3D (nrA,nzA,nx,dr0A,drr0A,dz0A,dzz0A,dx,dx2);
 
-
 ntA=nrA*nzA*nx; %total number of grid points block A
 nt1=ntA;
- 
-
-  %% pointers to BC
-       pointerstoBC;
+% pointers to BC
+  pointerstoBC;
        
-   
+  %% Newton method 
     %Inittial guess solution x0
     order='[';
     for j=1:nbl
@@ -122,12 +111,11 @@ dt=10^(10);
 x0m = x0;
 x0mm = x0m;
 
-%% Newton method
+
 
      error=1e9;
     iter=0;
     while (error > 1e-2 && iter < 300)
-        %%
         % Increase the iteration counter
         iter=iter+1;
 
@@ -153,7 +141,8 @@ x0mm = x0m;
     end
 %making x0 redeable
  xotoredeable
-%plotting figure 3 in the paperç
+
+ %% Plotting figure 3 in the paper
 plottingslide
 
    

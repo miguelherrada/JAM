@@ -1,0 +1,415 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      -->
+<title>JAM example II of the article "Goodbye Christoffel Symbols: A Flexible and Efficient Approach for Solving Physical Problems in Curved Spaces" by Miguel A. Herrada</title>
+<meta name="generator" content="MATLAB 24.1">
+<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
+<meta name="DC.date" content="2025-04-02">
+<meta name="DC.source" content="Mainelbow3D.m">
+<style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style>
+</head>
+<body>
+<div class="content">
+<h1>JAM example II of the article "Goodbye Christoffel Symbols: A Flexible and Efficient Approach for Solving Physical Problems in Curved Spaces" by Miguel A. Herrada</h1>
+<!--introduction-->
+<!--/introduction-->
+<h2>Contents</h2>
+<div>
+<ul>
+<li>
+<a href="#1">Initial Setup</a>
+</li>
+<li>
+<a href="#2">Problem Configuration</a>
+</li>
+<li>
+<a href="#3">Compute symbolic functions</a>
+</li>
+<li>
+<a href="#4">Domain Discretization</a>
+</li>
+<li>
+<a href="#5">Newton method</a>
+</li>
+<li>
+<a href="#6">Plotting figure 3 in the paper</a>
+</li>
+</ul>
+</div>
+<h2 id="1">Initial Setup</h2>
+<pre class="codeinput">clear <span class="string">all</span>;<span class="comment">% Clear workspace</span>
+restoredefaultpath;
+path_jacobian= [<span class="string">'jacobians3D/'</span>];<span class="comment">% Restore default MATLAB paths</span>
+path(path,[pwd <span class="string">'/'</span> path_jacobian]);<span class="comment">% Path for Jacobian functions</span>
+<span class="comment">%Collocation matrices</span>
+path_jacobian1= [<span class="string">'../utils/collocationmatrices/'</span>];<span class="comment">% Path for collocation matrices</span>
+path(path,path_jacobian1)
+</pre>
+<h2 id="2">Problem Configuration</h2>
+<pre class="codeinput">
+<span class="comment">% Number of parameters:</span>
+Np = 2; <span class="comment">%  Re and L</span>
+<span class="comment">% List of blocks</span>
+list_block = {<span class="string">'A'</span> };
+<span class="comment">%List of variables: Cartesian velocity filed V=[v_x,v_y,v_z] and pressure</span>
+list_var_A = {<span class="string">'uA'</span>, <span class="string">'vA'</span>,  <span class="string">'wA'</span> <span class="string">'pA'</span>};<span class="comment">% uA is  v_x, vA is v_y, wA is v_z and p is the pressure</span>
+<span class="comment">%symbolic velocity and pressure field</span>
+list_varsymbolic = {<span class="string">'u'</span>, <span class="string">'v'</span>, <span class="string">'w'</span>, <span class="string">'p'</span>};
+<span class="comment">%Number of variables</span>
+NV1=length(list_var_A);
+[basura nbl ] = size(list_block);
+<span class="comment">% The list of derivatives: r0 is \eta z0 is s  and t0 is \thetata time is time</span>
+list_der = {<span class="string">''</span>, <span class="string">'r0'</span>, <span class="string">'z0'</span>,                <span class="string">'rr0'</span>,     <span class="string">'zz0'</span>   ,  <span class="string">'rz0'</span>,   <span class="string">'time0'</span>,  <span class="string">'t0'</span> ,<span class="string">'tt0'</span>   ,<span class="string">'tz0'</span>    ,  <span class="string">'tr0'</span>};
+<span class="comment">% The list of symbolic derivatives:</span>
+list_dersymbolic = {<span class="string">''</span>, <span class="string">',r0)'</span>, <span class="string">',z0)'</span>,  <span class="string">',r0,r0)'</span>, <span class="string">',z0,z0)'</span> , <span class="string">',r0,z0)'</span> ,<span class="string">',time)'</span> <span class="string">',t0)'</span>,<span class="string">',t0,t0)'</span>,<span class="string">',t0,z0)'</span>,<span class="string">',t0,r0)'</span> };
+<span class="comment">%Number of derivatives</span>
+ND1=length(list_der);
+
+<span class="keyword">for</span> i=1:nbl
+    bl = list_block{i};
+    order = [<span class="string">'[bas NV'</span> bl <span class="string">'] = size(list_var_'</span> bl <span class="string">');'</span>];
+    evalc(order);
+    order = [<span class="string">'[bas ND'</span> bl <span class="string">'] = size(list_der);'</span> ];
+    evalc(order);
+<span class="keyword">end</span>
+</pre>
+<h2 id="3">Compute symbolic functions</h2>
+<pre class="codeinput">lset=0  <span class="comment">%If lset=1 we compile the equations</span>
+<span class="keyword">if</span>(lset==1)
+
+<span class="comment">%parameters</span>
+<span class="keyword">for</span> i=1:Np
+pa(i,1)=sym([<span class="string">'pa_'</span>,num2str(i)],<span class="string">'real'</span>);
+<span class="keyword">end</span>
+Re=pa(1); <span class="comment">% Reynolds number</span>
+L=pa(2); <span class="comment">%legnt of the pipe (timesx radius)</span>
+blockAcartesianvelocity
+<span class="keyword">end</span>
+</pre>
+<h2 id="4">Domain Discretization</h2>
+<pre class="codeinput">
+<span class="comment">%Control parameters</span>
+<span class="comment">%Reynolds number</span>
+Re=0.0001;
+<span class="comment">%Dimensionless length of the tube</span>
+L=10;
+pa=[Re;L];
+
+<span class="comment">%\eta discretization</span>
+nrA=8; <span class="comment">%number Chebyshev spectral collocation points in\theta</span>
+epsilon=0.001; <span class="comment">%epsilon value</span>
+<span class="comment">%x</span>
+[r0A,dr0A,drr0A]=Chevigood(nrA-1,1,0.001); <span class="comment">%eta</span>
+<span class="comment">%s  discretization</span>
+nzA=101; <span class="comment">%4th order finite differences</span>
+[z0A,dz0A,dzz0A]=finites4thsparse(nzA,pi/2); <span class="comment">%s</span>
+<span class="comment">%theta dervivative</span>
+nx=8; <span class="comment">%Fourier collocation points</span>
+[xx,dx] = fourdif(nx,1); <span class="comment">%theta</span>
+[xx,dx2] = fourdif(nx,2);
+
+<span class="comment">%Getting geometry</span>
+plottingelbowinit
+
+<span class="comment">% initialization of variable of block</span>
+uA=0*ones(nrA,nzA,nx);
+wA=0*ones(nrA,nzA,nx);
+vA=0*ones(nrA,nzA,nx);
+pA=0*ones(nrA,nzA,nx);
+
+rA=repmat(r0A', [1 nzA nx]);
+<span class="comment">%full collocation matrices</span>
+[ddr0A,ddrr0A,ddz0A,ddzz0A,ddx0A,ddxx0A,ddrz0A,ddzx0A,ddrx0A]= matrices3D (nrA,nzA,nx,dr0A,drr0A,dz0A,dzz0A,dx,dx2);
+
+ntA=nrA*nzA*nx; <span class="comment">%total number of grid points block A</span>
+nt1=ntA;
+<span class="comment">% pointers to BC</span>
+  pointerstoBC;
+</pre>
+<h2 id="5">Newton method</h2>
+<pre class="codeinput">    <span class="comment">%Inittial guess solution x0</span>
+    order=<span class="string">'['</span>;
+    <span class="keyword">for</span> j=1:nbl
+        bl = list_block{j};
+        NVAR = eval([<span class="string">'NV'</span> bl]);
+        <span class="keyword">for</span> i=1:NVAR
+            lv = eval([<span class="string">'list_var_'</span> bl <span class="string">'{'</span> num2str(i) <span class="string">'}'</span>]);
+            order = [order <span class="string">'reshape('</span> lv <span class="string">',nt'</span> bl <span class="string">',1);'</span>];
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    x0=eval([order <span class="string">']'</span>]);
+
+
+
+<span class="comment">%single time step</span>
+dt=10^(10);
+<span class="comment">%previous solutions in t-dt, t-2*dt</span>
+x0m = x0;
+x0mm = x0m;
+
+
+
+     error=1e9;
+    iter=0;
+    <span class="keyword">while</span> (error &gt; 1e-2 &amp;&amp; iter &lt; 300)
+        <span class="comment">% Increase the iteration counter</span>
+        iter=iter+1;
+
+         tic
+  <span class="comment">%getting matrices a (numerical jacobian DF) and vector b (fuction F)</span>
+       matrixAB3Doptima1
+  <span class="comment">%inversion</span>
+       dxa=(a\b);
+            toc
+
+   <span class="comment">%errors</span>
+        error=max(abs(dxa))
+
+        <span class="keyword">if</span>(error &gt; 10^9)
+            stop
+        <span class="keyword">end</span>
+       <span class="comment">% Apply the correction</span>
+        x0=x0+dxa;
+
+
+
+
+    <span class="keyword">end</span>
+<span class="comment">%making x0 redeable</span>
+ xotoredeable
+</pre>
+<h2 id="6">Plotting figure 3 in the paper</h2>
+<pre class="codeinput">plottingslide
+</pre>
+<p class="footer">
+<br>
+<a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2024a</a>
+<br>
+</p>
+</div>
+<!--
+##### SOURCE BEGIN #####
+%% JAM example II of the article "Goodbye Christoffel Symbols: A Flexible and Efficient Approach for Solving Physical Problems in Curved Spaces" by Miguel A. Herrada
+
+%% Initial Setup
+clear all;% Clear workspace
+restoredefaultpath;
+path_jacobian= ['jacobians3D/'];% Restore default MATLAB paths
+path(path,[pwd '/' path_jacobian]);% Path for Jacobian functions
+%Collocation matrices
+path_jacobian1= ['../utils/collocationmatrices/'];% Path for collocation matrices
+path(path,path_jacobian1)
+
+%% Problem Configuration
+
+% Number of parameters:
+Np = 2; %  Re and L
+% List of blocks
+list_block = {'A' };
+%List of variables: Cartesian velocity filed V=[v_x,v_y,v_z] and pressure
+list_var_A = {'uA', 'vA',  'wA' 'pA'};% uA is  v_x, vA is v_y, wA is v_z and p is the pressure      
+%symbolic velocity and pressure field
+list_varsymbolic = {'u', 'v', 'w', 'p'}; 
+%Number of variables
+NV1=length(list_var_A);
+[basura nbl ] = size(list_block);
+% The list of derivatives: r0 is \eta z0 is s  and t0 is \thetata time is time 
+list_der = {'', 'r0', 'z0',                'rr0',     'zz0'   ,  'rz0',   'time0',  't0' ,'tt0'   ,'tz0'    ,  'tr0'};
+% The list of symbolic derivatives: 
+list_dersymbolic = {'', ',r0)', ',z0)',  ',r0,r0)', ',z0,z0)' , ',r0,z0)' ,',time)' ',t0)',',t0,t0)',',t0,z0)',',t0,r0)' };
+%Number of derivatives
+ND1=length(list_der);
+
+for i=1:nbl
+    bl = list_block{i};
+    order = ['[bas NV' bl '] = size(list_var_' bl ');'];
+    evalc(order);
+    order = ['[bas ND' bl '] = size(list_der);' ];
+    evalc(order);
+end
+
+
+ %% Compute symbolic functions
+lset=0  %If lset=1 we compile the equations
+if(lset==1)
+
+%parameters
+for i=1:Np 
+pa(i,1)=sym(['pa_',num2str(i)],'real');
+end
+Re=pa(1); % Reynolds number
+L=pa(2); %legnt of the pipe (timesx radius)
+blockAcartesianvelocity 
+end
+
+%%  Domain Discretization 
+%Control parameters
+%Reynolds number
+Re=0.0001;
+%Dimensionless length of the tube
+L=10;
+pa=[Re;L];
+   
+%\eta discretization
+nrA=8; %number Chebyshev spectral collocation points in\theta
+epsilon=0.001; %epsilon value
+%x
+[r0A,dr0A,drr0A]=Chevigood(nrA-1,1,0.001); %eta
+%s  discretization
+nzA=101; %4th order finite differences
+[z0A,dz0A,dzz0A]=finites4thsparse(nzA,pi/2); %s
+%theta dervivative
+nx=8; %Fourier collocation points
+[xx,dx] = fourdif(nx,1); %theta
+[xx,dx2] = fourdif(nx,2);   
+
+%Getting geometry
+plottingelbowinit
+
+% initialization of variable of block
+uA=0*ones(nrA,nzA,nx);
+wA=0*ones(nrA,nzA,nx);
+vA=0*ones(nrA,nzA,nx);
+pA=0*ones(nrA,nzA,nx);
+
+rA=repmat(r0A', [1 nzA nx]);
+%full collocation matrices
+[ddr0A,ddrr0A,ddz0A,ddzz0A,ddx0A,ddxx0A,ddrz0A,ddzx0A,ddrx0A]= matrices3D (nrA,nzA,nx,dr0A,drr0A,dz0A,dzz0A,dx,dx2);
+
+ntA=nrA*nzA*nx; %total number of grid points block A
+nt1=ntA;
+% pointers to BC
+  pointerstoBC;
+       
+  %% Newton method 
+    %Inittial guess solution x0
+    order='[';
+    for j=1:nbl
+        bl = list_block{j};
+        NVAR = eval(['NV' bl]);
+        for i=1:NVAR
+            lv = eval(['list_var_' bl '{' num2str(i) '}']);
+            order = [order 'reshape(' lv ',nt' bl ',1);'];
+        end
+    end
+    x0=eval([order ']']);
+    
+
+    
+%single time step
+dt=10^(10);
+%previous solutions in t-dt, t-2*dt  
+x0m = x0;
+x0mm = x0m;
+
+
+
+     error=1e9;
+    iter=0;
+    while (error > 1e-2 && iter < 300)
+        % Increase the iteration counter
+        iter=iter+1;
+
+         tic  
+  %getting matrices a (numerical jacobian DF) and vector b (fuction F)
+       matrixAB3Doptima1
+  %inversion
+       dxa=(a\b);
+            toc
+       
+   %errors   
+        error=max(abs(dxa))
+        
+        if(error > 10^9)
+            stop
+        end
+       % Apply the correction
+        x0=x0+dxa;
+       
+       
+       
+      
+    end
+%making x0 redeable
+ xotoredeable
+
+ %% Plotting figure 3 in the paper
+plottingslide
+
+   
+    
+
+
+
+
+
+##### SOURCE END #####
+-->
+</body>
+</html>
