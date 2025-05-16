@@ -2,7 +2,7 @@
 
 % Expand x0 into block variables
 lv = 0;
-for j = 1:Nblock
+for j = 1:NRegion
     for i = 1:NVAR(j)
         lv = lv + 1;
         variable_name = list_var{j}{i};
@@ -13,7 +13,7 @@ end
 
 % Expand to full domain variables
 lv = 0;
-for k = 1:Nblock
+for k = 1:NRegion
     for i = 1:NVAR(k)
         lv = lv + 1;
         variable_name = list_var{k}{i};
@@ -25,7 +25,7 @@ end
 % Update x0full
 x0full = zeros(ntA * NVA, 1); % Preallocate
 idx = 1;
-for j = 1:Nblock
+for j = 1:NRegion
     for i = 1:NVAR(j)
         variable_name = list_var{j}{i};
         x0full(idx:idx+ntA-1) = reshape(eval(sprintf('%s%dfull', variable_name, j)), ntA, 1);
