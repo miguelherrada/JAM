@@ -1,17 +1,12 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<!--
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      -->
-<title>JAM Example: 2D Flow Around a Cylinder</title>
-<meta name="generator" content="MATLAB 24.1">
-<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
-<meta name="DC.date" content="2025-03-25">
-<meta name="DC.source" content="Maincylinder.m">
-<style type="text/css">
+      --><title>JAM Tutorial: 2D Laminar Flow Around a Cylinder</title><meta name="generator" content="MATLAB 9.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2025-05-12"><meta name="DC.source" content="Maincylinder.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -72,118 +67,69 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style>
-</head>
-<body>
-<div class="content">
-<h1>JAM Example: 2D Flow Around a Cylinder</h1>
-<!--introduction-->
-<!--/introduction-->
-<h2>Contents</h2>
-<div>
-<ul>
-<li>
-<a href="#1">Initial Setup</a>
-</li>
-<li>
-<a href="#2">Problem Configuration</a>
-</li>
-<li>
-<a href="#3">Derivative Definitions</a>
-</li>
-<li>
-<a href="#4">Compute symbolic functions</a>
-</li>
-<li>
-<a href="#5">Domain Discretization</a>
-</li>
-<li>
-<a href="#6">Equation Pointers and Projection Matrices</a>
-</li>
-<li>
-<a href="#7">Variable Initialization</a>
-</li>
-<li>
-<a href="#8">Physical Grid Generation</a>
-</li>
-<li>
-<a href="#9">Full Variable Expansion</a>
-</li>
-<li>
-<a href="#10">Simulation Parameters</a>
-</li>
-<li>
-<a href="#11">Time Integration</a>
-</li>
-<li>
-<a href="#12">Visualization</a>
-</li>
-</ul>
-</div>
-<h2 id="1">Initial Setup</h2>
-<pre class="codeinput">clear <span class="string">all</span>; <span class="comment">% Clear workspace</span>
+  </style></head><body><div class="content"><h1>JAM Tutorial: 2D Laminar Flow Around a Cylinder</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Initial Setup</a></li><li><a href="#2">Problem Configuration</a></li><li><a href="#4">Derivative Definitions</a></li><li><a href="#5">Compute symbolic functions</a></li><li><a href="#6">Numerical Simulation: Domain Discretization</a></li><li><a href="#8">Equation Pointers and Projection Matrices</a></li><li><a href="#9">Variable Initialization</a></li><li><a href="#10">Physical Grid Generation</a></li><li><a href="#11">Full Variable Expansion</a></li><li><a href="#12">Simulation Parameters and Initial Guess</a></li><li><a href="#13">Time Integration Setup</a></li><li><a href="#15">Main Simulation Loop (Newton-Raphson)</a></li><li><a href="#17">Numerical resolution with the Newton-Raphson method</a></li><li><a href="#24">Visualization</a></li></ul></div><h2 id="1">Initial Setup</h2><p>Clears the workspace, restores default MATLAB paths, and sets up a subfolder 'equation/' for storing auxiliary functions. This ensures a clean environment and organizes generated function files.</p><pre class="codeinput">clear <span class="string">all</span>; <span class="comment">% Clear workspace</span>
 restoredefaultpath; <span class="comment">% Restore default MATLAB paths</span>
-path_jacobian = [<span class="string">'eigen/jacobians/'</span>];<span class="comment">%Symbolic equations</span>
-addpath([pwd <span class="string">'/eigen/jacobians/'</span>]); <span class="comment">% Path for Jacobian functions</span>
-addpath(<span class="string">'../utils/collocationmatrices/'</span>); <span class="comment">% Path for collocation matrices</span>
-</pre>
-<h2 id="2">Problem Configuration</h2>
-<pre class="codeinput">Np = 8; <span class="comment">% Number of dimensionless parameters</span>
-Nblock = 2; <span class="comment">% Number of domain blocks (lower and upper)</span>
+pathequation = [<span class="string">'equation/'</span>];<span class="comment">%Symbolic equations</span>
+<span class="keyword">if</span> ~isfolder(pathequation)
+    mkdir(pathequation);
+<span class="keyword">end</span>
+addpath([pwd <span class="string">'/'</span> pathequation]); <span class="comment">% Path for Jacobian functions</span>
+</pre><h2 id="2">Problem Configuration</h2><p>This section defines the physical parameters and computational domain for the 2D laminar flow around a cylinder problem.</p><p>A sketch of the physical problem is shown below:</p><p>
+<object type="image/svg+xml" data="sketch.svg" width="1200" height="300"> </object>
+</p><p>The problem is formulated in dimensionless form using the incident velocity, cylinder radius, and fluid density. The primary independent physical parameter is the Reynolds number (<img src="Maincylinder_eq18259378160990964877.png" alt="$Re$" style="width:18px;height:11px;">). Other parameters define the computational domain geometry.</p><pre class="codeinput"><span class="comment">% List of physical and domain parameters</span>
+list_param = {<span class="string">'Re'</span>, <span class="string">'Rout'</span>, <span class="string">'L1'</span>, <span class="string">'L2'</span>, <span class="string">'Y1'</span>, <span class="string">'X1'</span>, <span class="string">'Y2'</span>, <span class="string">'X2'</span>};
+Np = length(list_param);
+</pre><p>The computational domain will be divided in two regions. In this particular example, in both region are each are defined the same unknowns, the velocity components in cartesian, <img src="Maincylinder_eq06270988635928577365.png" alt="$v_x$" style="width:13px;height:10px;"> and <img src="Maincylinder_eq06088869257320035165.png" alt="$v_y$" style="width:12px;height:12px;">; the pressure <img src="Maincylinder_eq03729901751903020778.png" alt="$p$" style="width:8px;height:10px;"> and <img src="Maincylinder_eq01768238589472138476.png" alt="$F$" style="width:11px;height:11px;"> and <img src="Maincylinder_eq03493110191331711391.png" alt="$G$" style="width:11px;height:11px;"> which relates the physical domain, (x,y,z), with the mapped one <img src="Maincylinder_eq00501811452673162484.png" alt="$(r_o,z_o,q_o)$" style="width:59px;height:15px;">.</p><p><img src="Maincylinder_eq08481768736151079945.png" alt="$$ x = F( r_o, z_o, q_o ; t_o) $$" style="width:117px;height:15px;"></p><p><img src="Maincylinder_eq16863239002605901336.png" alt="$$ y = G( r_o, z_o, q_o ; t_o) $$" style="width:117px;height:15px;"></p><p><img src="Maincylinder_eq06414312054007408643.png" alt="$$ z = H( r_o, z_o, q_o ; t_o) $$" style="width:118px;height:15px;"></p><p><img src="Maincylinder_eq09873474817816612053.png" alt="$t_o$" style="width:10px;height:12px;"> is the corresponding time-variable in the mapped space. Note that in this present case <img src="Maincylinder_eq10879027105837505533.png" alt="$H$" style="width:13px;height:11px;"> does not appears because of the 2D character of the problem. We keep track also of the total number of the variables in the regions.</p><pre class="codeinput">NRegion = 2; <span class="comment">% Number of domain blocks (lower and upper)</span>
 list_var{1} = {<span class="string">'vy'</span>, <span class="string">'vx'</span>, <span class="string">'p'</span>, <span class="string">'F'</span>, <span class="string">'G'</span>}; <span class="comment">% Variables in block 1 (lower: y&lt;0)</span>
 list_var{2} = {<span class="string">'vy'</span>, <span class="string">'vx'</span>, <span class="string">'p'</span>, <span class="string">'F'</span>, <span class="string">'G'</span>}; <span class="comment">% Variables in block 2 (upper: y&gt;0)</span>
 list_varA = cat(2, list_var{:}); <span class="comment">% All variables combined</span>
 NVAR = cellfun(@length, list_var); <span class="comment">% Number of variables per block</span>
 NVA = length(list_varA); <span class="comment">% Total number of variables</span>
-</pre>
-<h2 id="3">Derivative Definitions</h2>
-<pre class="codeinput">list_der0 = {<span class="string">''</span>, <span class="string">'r0'</span>, <span class="string">'z0'</span>, <span class="string">'rr0'</span>, <span class="string">'zz0'</span>, <span class="string">'rz0'</span>, <span class="string">'time0'</span>}; <span class="comment">% Derivative types</span>
-list_dersymbolic = {<span class="string">''</span>, <span class="string">',r0)'</span>, <span class="string">',z0)'</span>, <span class="string">',r0,r0)'</span>, <span class="string">',z0,z0)'</span>, <span class="string">',z0,r0)'</span> <span class="string">',time)'</span> };
-NDA = length(list_der0); <span class="comment">% Number of derivatives</span>
-Nequations = 8; <span class="comment">% Number of equation types in the domain</span>
-</pre>
-<h2 id="4">Compute symbolic functions</h2>
-<pre class="codeinput">leq=0; <span class="comment">%compiling</span>
-<span class="keyword">if</span> (leq==1)
 
+<span class="comment">% In addition to the regions, 8 specific locations (boundaries/interfaces)</span>
+<span class="comment">% are identified where the governing equations or boundary conditions</span>
+<span class="comment">% may differ.</span>
+Nequations = 8; <span class="comment">% Number of equation types in the domain</span>
+</pre><h2 id="4">Derivative Definitions</h2><p>Defines the types and orders of derivatives used in the equations. Derivatives are performed in the mapped computational space (<img src="Maincylinder_eq13126724384319731857.png" alt="$r_o, z_o; t_o$" style="width:48px;height:13px;">). '' : No derivative. Single character (e.g., 'r0'): First-order derivative with respect to that variable (e.g., <img src="Maincylinder_eq17930153101926374093.png" alt="$\partial/\partial_{r_o}$" style="width:32px;height:16px;">). The '0' indicates the mapped space. Repeated characters (e.g., 'rr0'): Higher-order derivative (e.g., <img src="Maincylinder_eq12221536623653970851.png" alt="$\partial^2/\partial_{r_o}^2$" style="width:37px;height:18px;">). Multiple characters (e.g., 'rz0'): Mixed derivative (e.g., <img src="Maincylinder_eq11524041453486803546.png" alt="$\partial^2/(\partial_{z_o} \partial_{r_o})$" style="width:67px;height:17px;">).</p><pre class="codeinput">list_der0 = {<span class="string">''</span>, <span class="string">'r0'</span>, <span class="string">'z0'</span>, <span class="string">'rr0'</span>, <span class="string">'zz0'</span>, <span class="string">'rz0'</span>,<span class="string">'t0'</span>}; <span class="comment">% Derivative types</span>
+NDA = length(list_der0); <span class="comment">% Number of derivatives</span>
+
+<span class="comment">% Generate symbolic representations for the derivatives (used internally</span>
+<span class="comment">% by symbolic processing scripts).</span>
+list_dersymbolic{1} = <span class="string">''</span>;
+<span class="keyword">for</span> i=2:NDA
+    name=list_der0{i};
+    out=[];
+    <span class="keyword">for</span> k=1:length(name)-1
+        out = [out <span class="string">','</span> name(k) <span class="string">'0'</span>];
+    <span class="keyword">end</span>
+    out = [out <span class="string">')'</span>];
+    list_dersymbolic{i} = out;
+<span class="keyword">end</span>
+</pre><h2 id="5">Compute symbolic functions</h2><p>This step derives the MATLAB functions for the problem's equations and their Jacobians using symbolic computation. This needs to be done only once unless the equations change. The flag `leq` controls whether this step is executed (1 to compile, 0 to skip). Symbolic parameters are created and then the <a href="blockA.html">blockA.m</a> script performs the symbolic derivation.</p><pre class="codeinput">leq=1; <span class="comment">%compiling</span>
+<span class="keyword">if</span> (leq==1)
     <span class="keyword">for</span> i=1:Np
     pa(i,1)=sym([<span class="string">'pa_'</span>,num2str(i)],<span class="string">'real'</span>);
+    eval(sprintf(<span class="string">'%s = pa(%d);'</span>,list_param{i},i))
     <span class="keyword">end</span>
-    Re=pa(1)  <span class="comment">% Reynolds numbers based on the Radius</span>
-  Rout=pa(2)  <span class="comment">% y=+-Rout: top-bottom y-posion of the 2D domain</span>
-    L1=pa(3); <span class="comment">% x=-L1: left x-position of the 2D domain</span>
-    L2=pa(4); <span class="comment">% x=+L2: right x-position of the 2D domain</span>
-    Y1=pa(5); <span class="comment">% y-boder for domain 1</span>
-    X1=pa(6); <span class="comment">% x-boder for domain 1</span>
-    Y2=pa(7); <span class="comment">% y-boder for domain 2</span>
-    X2=pa(8); <span class="comment">% x-boder for domain 2</span>
-    <span class="comment">%Compiling symbolic equations</span>
-    blockA;
+    blockA;  <span class="comment">%Symbolic calculation</span>
+    disp(<span class="string">'Symbolic calcultations done!'</span>)
 <span class="keyword">end</span>
-</pre>
-<h2 id="5">Domain Discretization</h2>
-<pre class="codeinput">nr = [17, 17]; <span class="comment">% Radial points per block (lower, upper)</span>
+</pre><h2 id="6">Numerical Simulation: Domain Discretization</h2><p>Sets the number of nodes in the radial and axial directions for each region.</p><pre class="codeinput">nr = [17, 17]; <span class="comment">% Radial nodes per region</span>
 nz = [801, 801]; <span class="comment">% Axial points per block (must be multiple of 4 + 1)</span>
-alphar = 3; <span class="comment">% Radial stretching parameter</span>
-[r0A, z0A, nrA, nzA, ddr0A, ddrr0A, ddz0A, ddzz0A, Ia, Ib, Ja, Jb] = <span class="keyword">...</span>
-    collocationmatrices2th(nr, nz, Nblock, alphar); <span class="comment">% Generate collocation matrices</span>
+</pre><p>the numerical differentiation of a certain variable, v1, in the entire numerical domain is performed through the derivatives collocation matrices genenerated within <a href="collocationmatrices2th.html">collocationmatrices2th.m</a> It also returns the indices (`Ia`, `Ib`, `Ja`, `Jb`) corresponding to the nodes within each region in the global discretized domain.</p><pre class="codeinput">[r0A, z0A, nrA, nzA, ddr0A, ddrr0A, ddz0A, ddzz0A, Ia, Ib, Ja, Jb] = <span class="keyword">...</span>
+    collocationmatrices2th(nr, nz, NRegion); <span class="comment">% Generate collocation matrices</span>
+
 ntA = nrA * nzA; <span class="comment">% Total grid points in full domain</span>
 nt = nr .* nz; <span class="comment">% Grid points per block</span>
-</pre>
-<h2 id="6">Equation Pointers and Projection Matrices</h2>
-<pre class="codeinput">pointers6; <span class="comment">% Call pointers6 to set up equation indices and projections</span>
-</pre>
-<h2 id="7">Variable Initialization</h2>
-<pre class="codeinput">idx = 1;
-<span class="keyword">for</span> k = 1:Nblock
+</pre><h2 id="8">Equation Pointers and Projection Matrices</h2><p>The <a href="pointers.html">pointers.m</a> script sets up indices and projection matrices required to map variables and equations between the regional and global domain representations and to apply boundary conditions.</p><pre class="codeinput">pointers;
+</pre><h2 id="9">Variable Initialization</h2><p>Initializes the solution variables (<img src="Maincylinder_eq10391039975580857941.png" alt="$v_y, v_x, p, F, G$" style="width:82px;height:15px;">) for each region with zero values. These will be populated with an initial guess or previous solution.</p><pre class="codeinput">idx = 1;
+<span class="keyword">for</span> k = 1:NRegion
     <span class="keyword">for</span> v = 1:NVAR(k)
         eval(sprintf(<span class="string">'%s%d = zeros(nr(%d), nz(%d));'</span>, list_varA{idx}, k, k, k));
         idx = idx + 1;
     <span class="keyword">end</span>
 <span class="keyword">end</span>
-</pre>
-<h2 id="8">Physical Grid Generation</h2>
-<pre class="codeinput">rA = repmat(r0A', 1, nzA); <span class="comment">% Radial coordinates</span>
+</pre><h2 id="10">Physical Grid Generation</h2><p>Generates the physical coordinates (x, y) for the computational grid based on the defined domain parameters and mapping functions.</p><pre class="codeinput">rA = repmat(r0A', 1, nzA); <span class="comment">% Radial coordinates</span>
 zA = repmat(z0A, nrA, 1); <span class="comment">% Axial coordinates</span>
 rrA{1} = repmat((r0A(1:nr(1))/r0A(1))', 1, nzA); <span class="comment">% Normalized radial coords (block 1)</span>
 rrA{2} = repmat((r0A(nr(1):nrA)/r0A(nrA))', 1, nzA); <span class="comment">% Normalized radial coords (block 2)</span>
@@ -209,7 +155,7 @@ g1{2} = g0{1}; <span class="comment">% Block 2 outer x-boundary</span>
 f1{2} = Rout * ones(1, nzA); <span class="comment">% Block 2 outer y-boundary</span>
 
 <span class="comment">% Generate initial mesh</span>
-<span class="keyword">for</span> k = 1:Nblock
+<span class="keyword">for</span> k = 1:NRegion
     z1 = zA(Ia(k):Ib(k), Ja(k):Jb(k));
     r1 = rrA{k};
     g00 = repmat(g0{k}, nr(k), 1);
@@ -230,10 +176,8 @@ Y1 = reshape(Y1, ntA, 1); <span class="comment">% Flatten y-coordinates</span>
 Y2 = reshape(Y2, ntA, 1);
 X1 = reshape(X1, ntA, 1); <span class="comment">% Flatten x-coordinates</span>
 X2 = reshape(X2, ntA, 1);
-</pre>
-<h2 id="9">Full Variable Expansion</h2>
-<pre class="codeinput">lv = 0;
-<span class="keyword">for</span> k = 1:Nblock
+</pre><h2 id="11">Full Variable Expansion</h2><p>Expands the initial/updated solution variables from their block-wise representation to the full global domain representation. This uses projection matrices (PNMv) generated in the `pointers.m` script.</p><pre class="codeinput">lv = 0;
+<span class="keyword">for</span> k = 1:NRegion
     <span class="keyword">for</span> i = 1:NVAR(k)
         lv = lv + 1;
         variable_name = list_var{k}{i};
@@ -241,101 +185,180 @@ X2 = reshape(X2, ntA, 1);
             variable_name, k, lv, variable_name, k, lv));
     <span class="keyword">end</span>
 <span class="keyword">end</span>
-</pre>
-<h2 id="10">Simulation Parameters</h2>
-<pre class="codeinput">Re = 10; <span class="comment">% Reynolds number</span>
+</pre><h2 id="12">Simulation Parameters and Initial Guess</h2><p>Sets the Reynolds number and the parameter vector. Calls a script (`redeabletoxooptima.m`) to prepare an initial guess for the solution vector (`x0` and `x0full`). Stores previous time step solutions for potential time integration schemes (although set up for a steady-state case here).</p><pre class="codeinput">Re = 10; <span class="comment">% Reynolds number</span>
 pa = [Re; Rout; L1; L2; 0; 0; 0; 0]; <span class="comment">% Parameter vector</span>
 redeabletoxooptima; <span class="comment">% Initial guess for x0 and x0full</span>
 x0mfull = x0full; <span class="comment">% Previous time step solution</span>
 x0mmfull = x0mfull; <span class="comment">% Previous-previous time step solution</span>
-</pre>
-<h2 id="11">Time Integration</h2>
-<pre class="codeinput">dt = 1e10; <span class="comment">% Large time step for steady-state</span>
-dt1 = 1e10;
-Ntimesteps = 1;
-<span class="keyword">for</span> ll = 1:Ntimesteps
-    error = 1e9; <span class="comment">% Initial error</span>
-    iter = 0;
-    <span class="keyword">while</span> error &gt; 1e-3 &amp;&amp; iter &lt; 300
-        iter = iter + 1;
-        matrixAB; <span class="comment">% Assemble system matrices</span>
-        dxa = a \ b; <span class="comment">% Solve for update</span>
-        error = max(abs(dxa)); <span class="comment">% Compute maximum error</span>
-        <span class="keyword">if</span> error &gt; 1e9, error(<span class="string">'Divergence detected'</span>); <span class="keyword">end</span>
-        x0 = x0 + (iter &lt; 6) * 0.05 * dxa + (iter &gt;= 6) * dxa; <span class="comment">% Apply update with under-relaxation</span>
-        xotoredeableoptima; <span class="comment">% Update variables</span>
-    <span class="keyword">end</span>
+</pre><h2 id="13">Time Integration Setup</h2><p>Sets up parameters for a generic second-order backward time integration scheme. However, for a steady-state problem, the time step (`dt`) is set to a very large value, effectively solving for the steady solution without actual time marching.</p><p><img src="Maincylinder_eq11937264106257927193.png" alt="$$ \dot{y}(t^n) = -\frac{2 \Delta t_1 +\Delta t_2}{\Delta t_1(\Delta t_1&#xA;+\Delta t_2)} y^n + \frac{\Delta t_1 +\Delta t_2}{\Delta t_1 \Delta t_1&#xA;} y^{n-1} + \frac{\Delta t_1}{\Delta t_2 (\Delta t_1&#xA;+\Delta t_2)} y^{n-2}  $$" style="width:441px;height:35px;"></p><p>In case of equal timestep it reduces to,</p><p><img src="Maincylinder_eq17602827600496209871.png" alt="$$ \dot{y}(t^n) = \frac{-3 y^n + 4 y^{n-1} - y^{n-2}}{2 \Delta t}  $$" style="width:185px;height:33px;"></p><p>In this case since we search a steady case (It is not a time evolution problem) we set <img src="Maincylinder_eq00791438275661894543.png" alt="$\Delta t$" style="width:17px;height:11px;"> to infinity.</p><pre class="codeinput">dt=1.e28;
+dt1=dt;
+</pre><p><i>ll</i> is the time step and <i>Ntimesteps</i> is the number of timesteps. In the present case = 1 because stationary</p><pre class="codeinput">Ntimesteps=1;
+
+<span class="keyword">if</span>(Ntimesteps&gt;1)
+tiempo(1) =0;
 <span class="keyword">end</span>
-</pre>
-<h2 id="12">Visualization</h2>
-<pre class="codeinput">velocity(G1, G2, F1, F2, vx1, vx2); <span class="comment">% Plot x-velocity</span>
-</pre>
-<p class="footer">
-<br>
-<a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2024a</a>
-<br>
-</p>
-</div>
-<!--
+<span class="comment">% The `tiempo` array would store the time instants for each step if Ntimesteps &gt; 1.</span>
+</pre><h2 id="15">Main Simulation Loop (Newton-Raphson)</h2><p>This loop performs the simulation. For this steady-state case, it runs only once (Ntimesteps=1). Inside the loop, the nonlinear system of equations is solved using the Newton-Raphson iterative method.</p><pre class="codeinput"><span class="keyword">for</span> ll=1:Ntimesteps
+</pre><pre class="codeinput">    <span class="keyword">if</span> (ll&gt;1)
+        tiempo(ll)=tiempo(ll-1)+dt;
+    <span class="keyword">end</span>
+</pre><h2 id="17">Numerical resolution with the Newton-Raphson method</h2><p>The Newton-Raphson method searchs to solve a nonlinear system of equations of the form, <img src="Maincylinder_eq10547113710904457291.png" alt="$$ F_i (x_j) = 0 $$" style="width:66px;height:16px;"></p><p>The Newton-Raphson  results from a Taylor analysis around <img src="Maincylinder_eq02631009533042252608.png" alt="$x_j$" style="width:13px;height:12px;">,</p><p><img src="Maincylinder_eq07587605452357356008.png" alt="$$ F_i (x_j + \delta x_j) = F_i (x_j) + \frac{\partial F_i}{\partial x_j} \delta x_j + ... $$" style="width:230px;height:35px;"></p><p>Demanding convergence,</p><p><img src="Maincylinder_eq09489039171568953000.png" alt="$$ F_i (x_j + \delta x_j) = 0$$" style="width:104px;height:16px;"></p><p>The Newton-Raphson iterative method results,</p><p><img src="Maincylinder_eq04781638976294667313.png" alt="$$  \frac{\partial F_i}{\partial x_j} \delta x_j = - F_i (x_j)  $$" style="width:115px;height:35px;"></p><p>or, in matrix form,</p><p><img src="Maincylinder_eq15308150327434130003.png" alt="$$\mathbf{A} \, \delta \mathbf{x}  = \mathbf{B}. $$" style="width:66px;height:11px;"></p><p>where <img src="Maincylinder_eq12790254556126781356.png" alt="$\mathbf{A}_{ij}$" style="width:20px;height:15px;"> is the Jacobian tensor.</p><p>Initiallizing the error <i>error</i> and the number of iterations <i>iter</i></p><pre class="codeinput">    error=1e9;
+    iter=0;
+    nitermax = 150;
+    errormax = 1e-3;
+    relaxation = 0.5;
+    <span class="keyword">while</span> (error &gt; errormax &amp;&amp; iter &lt; nitermax)
+</pre><pre class="codeinput">        iter=iter+1;
+</pre><p>Construct <img src="Maincylinder_eq15190527482521674856.png" alt="$\mathbf{A}$" style="width:12px;height:11px;"> and <img src="Maincylinder_eq16427099040942302163.png" alt="$\mathbf{B}$" style="width:11px;height:11px;"> with  <a href="matrixAB.html">matrixAB.m</a></p><pre class="codeinput">        matrixAB;
+</pre><p>Solve the linear system of equation to compute the correction <img src="Maincylinder_eq15306495665076039513.png" alt="$\delta \mathbf{x}$" style="width:16px;height:11px;">.</p><pre class="codeinput">        dxa=a\b;
+        error=max(abs(dxa))
+
+        <span class="keyword">if</span>(error &gt; 10^8) error(<span class="string">'Divergence detected'</span>); <span class="keyword">end</span>
+</pre><p>Apply the correction</p><pre class="codeinput">        x0=x0+relaxation*dxa;
+        xotoredeableoptima; <span class="comment">% Update variable</span>
+</pre><pre class="codeinput">    <span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><h2 id="24">Visualization</h2><pre class="codeinput">velocity(G1, G2, F1, F2, vx1, vx2); <span class="comment">% Plot x-velocity</span>
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2022b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
-%% JAM Example: 2D Flow Around a Cylinder
+%% JAM Tutorial: 2D Laminar Flow Around a Cylinder
 
 %% Initial Setup
+% Clears the workspace, restores default MATLAB paths, and sets up a
+% subfolder 'equation/' for storing auxiliary functions. This ensures a
+% clean environment and organizes generated function files.
+
 clear all; % Clear workspace
 restoredefaultpath; % Restore default MATLAB paths
-path_jacobian = ['eigen/jacobians/'];%Symbolic equations
-addpath([pwd '/eigen/jacobians/']); % Path for Jacobian functions
-addpath('../utils/collocationmatrices/'); % Path for collocation matrices
+pathequation = ['equation/'];%Symbolic equations
+if ~isfolder(pathequation)
+    mkdir(pathequation);
+end
+addpath([pwd '/' pathequation]); % Path for Jacobian functions
 
 %% Problem Configuration
-Np = 8; % Number of dimensionless parameters
-Nblock = 2; % Number of domain blocks (lower and upper)
+% This section defines the physical parameters and computational domain
+% for the 2D laminar flow around a cylinder problem.
+%
+% A sketch of the physical problem is shown below:
+%
+% <html>
+% <object type="image/svg+xml" data="sketch.svg" width="1200" height="300"> </object>
+% </html>
+%
+% The problem is formulated in dimensionless form using the incident
+% velocity, cylinder radius, and fluid density. The primary independent
+% physical parameter is the Reynolds number ($Re$). Other parameters
+% define the computational domain geometry.
+
+% List of physical and domain parameters
+list_param = {'Re', 'Rout', 'L1', 'L2', 'Y1', 'X1', 'Y2', 'X2'};
+Np = length(list_param);
+%%
+% The computational domain will be divided in two regions. In this particular example, in both 
+% region are each are defined the same unknowns, the velocity components in cartesian, $v_x$ and $v_y$; 
+% the pressure $p$ and $F$ and $G$ which relates the physical domain, (x,y,z), with
+% the mapped one $(r_o,z_o,q_o)$.
+%
+% $$ x = F( r_o, z_o, q_o ; t_o) $$
+%
+% $$ y = G( r_o, z_o, q_o ; t_o) $$
+%
+% $$ z = H( r_o, z_o, q_o ; t_o) $$
+%
+% $t_o$ is the corresponding time-variable in the mapped space. 
+% Note that in this present case $H$ does not appears because of the 2D character of the
+% problem. We keep track also of the total number of the variables in the regions.
+NRegion = 2; % Number of domain blocks (lower and upper)
 list_var{1} = {'vy', 'vx', 'p', 'F', 'G'}; % Variables in block 1 (lower: y<0)
 list_var{2} = {'vy', 'vx', 'p', 'F', 'G'}; % Variables in block 2 (upper: y>0)
 list_varA = cat(2, list_var{:}); % All variables combined
 NVAR = cellfun(@length, list_var); % Number of variables per block
 NVA = length(list_varA); % Total number of variables
 
-%% Derivative Definitions
-list_der0 = {'', 'r0', 'z0', 'rr0', 'zz0', 'rz0', 'time0'}; % Derivative types
-list_dersymbolic = {'', ',r0)', ',z0)', ',r0,r0)', ',z0,z0)', ',z0,r0)' ',time)' };
-NDA = length(list_der0); % Number of derivatives
+% In addition to the regions, 8 specific locations (boundaries/interfaces)
+% are identified where the governing equations or boundary conditions
+% may differ.
 Nequations = 8; % Number of equation types in the domain
 
-%% Compute symbolic functions
-leq=0; %compiling
-if (leq==1)
+%% Derivative Definitions
+% Defines the types and orders of derivatives used in the equations.
+% Derivatives are performed in the mapped computational space ($r_o, z_o; t_o$).
+% '' : No derivative.
+% Single character (e.g., 'r0'): First-order derivative with respect to that variable
+% (e.g., $\partial/\partial_{r_o}$). The '0' indicates the mapped space.
+% Repeated characters (e.g., 'rr0'): Higher-order derivative
+% (e.g., $\partial^2/\partial_{r_o}^2$).
+% Multiple characters (e.g., 'rz0'): Mixed derivative
+% (e.g., $\partial^2/(\partial_{z_o} \partial_{r_o})$).
 
-    for i=1:Np 
-    pa(i,1)=sym(['pa_',num2str(i)],'real');
+list_der0 = {'', 'r0', 'z0', 'rr0', 'zz0', 'rz0','t0'}; % Derivative types
+NDA = length(list_der0); % Number of derivatives
+
+% Generate symbolic representations for the derivatives (used internally
+% by symbolic processing scripts).
+list_dersymbolic{1} = '';
+for i=2:NDA
+    name=list_der0{i};
+    out=[];
+    for k=1:length(name)-1
+        out = [out ',' name(k) '0'];
     end
-    Re=pa(1)  % Reynolds numbers based on the Radius
-  Rout=pa(2)  % y=+-Rout: top-bottom y-posion of the 2D domain
-    L1=pa(3); % x=-L1: left x-position of the 2D domain
-    L2=pa(4); % x=+L2: right x-position of the 2D domain
-    Y1=pa(5); % y-boder for domain 1
-    X1=pa(6); % x-boder for domain 1
-    Y2=pa(7); % y-boder for domain 2
-    X2=pa(8); % x-boder for domain 2
-    %Compiling symbolic equations
-    blockA;  
+    out = [out ')'];
+    list_dersymbolic{i} = out;
 end
 
-%% Domain Discretization
-nr = [17, 17]; % Radial points per block (lower, upper)
+%% Compute symbolic functions
+% This step derives the MATLAB functions for the problem's equations and
+% their Jacobians using symbolic computation. This needs to be done only
+% once unless the equations change.
+% The flag `leq` controls whether this step is executed (1 to compile, 0 to skip).
+% Symbolic parameters are created and then the <blockA.html blockA.m> script
+% performs the symbolic derivation.
+ 
+leq=1; %compiling
+if (leq==1)
+    for i=1:Np 
+    pa(i,1)=sym(['pa_',num2str(i)],'real');
+    eval(sprintf('%s = pa(%d);',list_param{i},i))
+    end
+    blockA;  %Symbolic calculation
+    disp('Symbolic calcultations done!')
+end
+
+%% Numerical Simulation: Domain Discretization
+% Sets the number of nodes in the radial and axial directions for each region.
+
+nr = [17, 17]; % Radial nodes per region
 nz = [801, 801]; % Axial points per block (must be multiple of 4 + 1)
-alphar = 3; % Radial stretching parameter
+
+%%
+% the numerical differentiation of a certain variable, v1, in the entire 
+% numerical domain is performed through the derivatives collocation matrices
+% genenerated within 
+% <collocationmatrices2th.html collocationmatrices2th.m>
+% It also returns the indices (`Ia`, `Ib`,
+% `Ja`, `Jb`) corresponding to the nodes within each region in the
+% global discretized domain.
 [r0A, z0A, nrA, nzA, ddr0A, ddrr0A, ddz0A, ddzz0A, Ia, Ib, Ja, Jb] = ...
-    collocationmatrices2th(nr, nz, Nblock, alphar); % Generate collocation matrices
+    collocationmatrices2th(nr, nz, NRegion); % Generate collocation matrices
+
 ntA = nrA * nzA; % Total grid points in full domain
 nt = nr .* nz; % Grid points per block
 
 %% Equation Pointers and Projection Matrices
-pointers6; % Call pointers6 to set up equation indices and projections
+% The <pointers.html pointers.m> script sets up indices and projection
+% matrices required to map variables and equations between the regional
+% and global domain representations and to apply boundary conditions.
+% 
+pointers;
 
 %% Variable Initialization
+% Initializes the solution variables ($v_y, v_x, p, F, G$) for each region
+% with zero values. These will be populated with an initial guess or
+% previous solution.
 idx = 1;
-for k = 1:Nblock
+for k = 1:NRegion
     for v = 1:NVAR(k)
         eval(sprintf('%s%d = zeros(nr(%d), nz(%d));', list_varA{idx}, k, k, k));
         idx = idx + 1;
@@ -343,6 +366,9 @@ for k = 1:Nblock
 end
 
 %% Physical Grid Generation
+% Generates the physical coordinates (x, y) for the computational grid
+% based on the defined domain parameters and mapping functions.
+
 rA = repmat(r0A', 1, nzA); % Radial coordinates
 zA = repmat(z0A, nrA, 1); % Axial coordinates
 rrA{1} = repmat((r0A(1:nr(1))/r0A(1))', 1, nzA); % Normalized radial coords (block 1)
@@ -369,7 +395,7 @@ g1{2} = g0{1}; % Block 2 outer x-boundary
 f1{2} = Rout * ones(1, nzA); % Block 2 outer y-boundary
 
 % Generate initial mesh
-for k = 1:Nblock
+for k = 1:NRegion
     z1 = zA(Ia(k):Ib(k), Ja(k):Jb(k));
     r1 = rrA{k};
     g00 = repmat(g0{k}, nr(k), 1);
@@ -392,8 +418,12 @@ X1 = reshape(X1, ntA, 1); % Flatten x-coordinates
 X2 = reshape(X2, ntA, 1);
 
 %% Full Variable Expansion
+% Expands the initial/updated solution variables from their block-wise
+% representation to the full global domain representation. This uses
+% projection matrices (PNMv) generated in the `pointers.m` script.
+
 lv = 0;
-for k = 1:Nblock
+for k = 1:NRegion
     for i = 1:NVAR(k)
         lv = lv + 1;
         variable_name = list_var{k}{i};
@@ -402,34 +432,115 @@ for k = 1:Nblock
     end
 end
 
-%% Simulation Parameters
+%% Simulation Parameters and Initial Guess
+% Sets the Reynolds number and the parameter vector.
+% Calls a script (`redeabletoxooptima.m`) to prepare an initial guess
+% for the solution vector (`x0` and `x0full`).
+% Stores previous time step solutions for potential time integration schemes
+% (although set up for a steady-state case here).
+
 Re = 10; % Reynolds number
 pa = [Re; Rout; L1; L2; 0; 0; 0; 0]; % Parameter vector
 redeabletoxooptima; % Initial guess for x0 and x0full
 x0mfull = x0full; % Previous time step solution
 x0mmfull = x0mfull; % Previous-previous time step solution
 
-%% Time Integration
-dt = 1e10; % Large time step for steady-state
-dt1 = 1e10;
-Ntimesteps = 1;
-for ll = 1:Ntimesteps
-    error = 1e9; % Initial error
-    iter = 0;
-    while error > 1e-3 && iter < 300
-        iter = iter + 1;
-        matrixAB; % Assemble system matrices
-        dxa = a \ b; % Solve for update
-        error = max(abs(dxa)); % Compute maximum error
-        if error > 1e9, error('Divergence detected'); end
-        x0 = x0 + (iter < 6) * 0.05 * dxa + (iter >= 6) * dxa; % Apply update with under-relaxation
-        xotoredeableoptima; % Update variables
+%% Time Integration Setup
+% Sets up parameters for a generic second-order backward time integration
+% scheme. However, for a steady-state problem, the time step (`dt`) is
+% set to a very large value, effectively solving for the steady solution
+% without actual time marching.
+%
+% $$ \dot{y}(t^n) = -\frac{2 \Delta t_1 +\Delta t_2}{\Delta t_1(\Delta t_1
+% +\Delta t_2)} y^n + \frac{\Delta t_1 +\Delta t_2}{\Delta t_1 \Delta t_1
+% } y^{n-1} + \frac{\Delta t_1}{\Delta t_2 (\Delta t_1
+% +\Delta t_2)} y^{n-2}  $$
+%
+% In case of equal timestep it reduces to,
+%
+% $$ \dot{y}(t^n) = \frac{-3 y^n + 4 y^{n-1} - y^{n-2}}{2 \Delta t}  $$
+%
+% In this case since we search a steady case (It is not a time evolution
+% problem) we set $\Delta t$ to infinity.
+%
+dt=1.e28;
+dt1=dt;
+
+%%
+% _ll_ is the time step and _Ntimesteps_ is the number of timesteps. In the present
+% case = 1 because stationary
+%
+
+Ntimesteps=1;
+
+if(Ntimesteps>1)
+tiempo(1) =0;
+end
+% The `tiempo` array would store the time instants for each step if Ntimesteps > 1.
+
+%% Main Simulation Loop (Newton-Raphson)
+% This loop performs the simulation. For this steady-state case, it runs
+% only once (Ntimesteps=1). Inside the loop, the nonlinear system of
+% equations is solved using the Newton-Raphson iterative method.
+
+for ll=1:Ntimesteps
+    
+    if (ll>1)
+        tiempo(ll)=tiempo(ll-1)+dt;
+    end
+    
+    %% Numerical resolution with the Newton-Raphson method
+    %
+    % The Newton-Raphson method searchs to solve a nonlinear system of equations
+    % of the form,
+    % $$ F_i (x_j) = 0 $$
+    %
+    % The Newton-Raphson  results from a Taylor analysis around $x_j$,
+    %
+    % $$ F_i (x_j + \delta x_j) = F_i (x_j) + \frac{\partial F_i}{\partial x_j} \delta x_j + ... $$
+    %
+    % Demanding convergence,
+    %
+    % $$ F_i (x_j + \delta x_j) = 0$$
+    %
+    % The Newton-Raphson iterative method results,
+    %
+    % $$  \frac{\partial F_i}{\partial x_j} \delta x_j = - F_i (x_j)  $$
+    %
+    % or, in matrix form,
+    %
+    % $$\mathbf{A} \, \delta \mathbf{x}  = \mathbf{B}. $$
+    %
+    % where $\mathbf{A}_{ij}$ is the Jacobian tensor.
+    %
+    % Initiallizing the error _error_ and the number of iterations _iter_
+    
+    error=1e9;
+    iter=0;
+    nitermax = 150;
+    errormax = 1e-3;
+    relaxation = 0.5;
+    while (error > errormax && iter < nitermax)
+        iter=iter+1;
+        %%
+        % Construct $\mathbf{A}$ and $\mathbf{B}$ with  <matrixAB.html matrixAB.m>
+        matrixAB;
+        %%
+        % Solve the linear system of equation to
+        % compute the correction $\delta \mathbf{x}$.
+        dxa=a\b;
+        error=max(abs(dxa))
+        
+        if(error > 10^8) error('Divergence detected'); end
+        %%
+        % Apply the correction
+
+        x0=x0+relaxation*dxa;
+        xotoredeableoptima; % Update variable
     end
 end
-
 %% Visualization
 velocity(G1, G2, F1, F2, vx1, vx2); % Plot x-velocity
+
 ##### SOURCE END #####
--->
-</body>
-</html>
+--></body></html>

@@ -1,17 +1,12 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<!--
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      -->
-<title>collocationmatrices2th</title>
-<meta name="generator" content="MATLAB 23.2">
-<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
-<meta name="DC.date" content="2025-03-26">
-<meta name="DC.source" content="collocationmatrices2th.m">
-<style type="text/css">
+      --><title>collocationmatrices2th</title><meta name="generator" content="MATLAB 9.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2025-05-12"><meta name="DC.source" content="collocationmatrices2th.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -72,143 +67,187 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style>
-</head>
-<body>
-<div class="content">
-<h2>Contents</h2>
-<div>
-<ul>
-<li>
-<a href="#2">Generate collocation matrices for 2D domain</a>
-</li>
-</ul>
-</div>
-<pre class="codeinput">
-<span class="keyword">function</span> [r0A, z0A, nrA, nzA, ddr0A, ddrr0A, ddz0A, ddzz0A, Ia, Ib, Ja, Jb] = <span class="keyword">...</span>
-    collocationmatrices2th(nr, nz, Nblock, alphar)
-</pre>
-<h2 id="2">Generate collocation matrices for 2D domain</h2>
-<pre class="codeinput">nrA = nr(1) + nr(2) - 1; <span class="comment">% Total radial points</span>
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Generate collocation matrices for 2D domain</a></li><li><a href="#3">1D Differentiation Matrices</a></li><li><a href="#5">Region Indexing</a></li><li><a href="#6">Extend Regional Matrices to Full Domain (Sparse Embedding)</a></li><li><a href="#7">Create Masks and Global Operators using Kronecker Products</a></li></ul></div><h2 id="1">Generate collocation matrices for 2D domain</h2><p>function to set the numerical collocation matrices.</p><pre class="codeinput"><span class="keyword">function</span> [r0A, z0A, nrA, nzA, ddr0A, ddrr0A, ddz0A, ddzz0A, Ia, Ib, Ja, Jb] = <span class="keyword">...</span>
+    collocationmatrices2th(nr, nz, NRegion)
+</pre><pre class="codeinput"><span class="comment">%</span>
+<span class="comment">% First we compute the total number on nodes in radial and axial direction</span>
+nrA = nr(1) + nr(2) - 1; <span class="comment">% Total radial points</span>
 nzA = nz(1); <span class="comment">% Total axial points</span>
-
-<span class="comment">% Radial collocation matrices</span>
+</pre><h2 id="3">1D Differentiation Matrices</h2><p>Compute the 1D collocation differentiation matrices for the radial direction of each region. This allows the radial numerical derivative of a function 'v' at node 'i' to be computed from the array of node values 'v_j' using the formula:</p><p><img src="collocationmatrices2th_eq05182984804948567066.png" alt="$$ \partial_r v|_i = \sum dr0A_{ij} \: v_j $$" style="width:129px;height:21px;"></p><p>In the radial direction, a Chebyshev approximation is used. A transformation (tanh mapping, specifically Chevitanh/Chevitanh_inverse) is applied to cluster nodes near one of the domain boundaries (r=-1, r=0, r=1). This clustering helps capture boundary layer effects or sharp gradients.</p><pre class="codeinput">alphar = 3.;
 [r0A1, dr0A{1}, drr0A{1}] = Chevitanh(nr(1)-1, -1, 0, alphar); <span class="comment">% Lower block</span>
 [r0A2, dr0A{2}, drr0A{2}] = Chevitanh_inverse(nr(2)-1, 0, 1, alphar); <span class="comment">% Upper block</span>
 r0A = [r0A1(1:nr(1)), r0A2(2:nr(2))]; <span class="comment">% Combined radial coordinates</span>
-
-<span class="comment">% Axial collocation matrices</span>
-[z0A, dz0A{1}, dzz0A{1}] = finites2thsparse(nz(1), 1); <span class="comment">% Axial matrices</span>
+</pre><p>In the axial direction, a second-order finite difference approximation is used.</p><pre class="codeinput">[z0A, dz0A{1}, dzz0A{1}] = finites2thsparse(nz(1), 1); <span class="comment">% Axial matrices</span>
 [z0A, dz0A{2}, dzz0A{2}] = finites2thsparse(nz(2), 1); <span class="comment">% Axial matrices</span>
-<span class="comment">% Block indices</span>
-Ia = [1, nr(1)]; Ib = [nr(1), nrA]; Ja = [1, 1]; Jb = [nzA, nzA];
+</pre><h2 id="5">Region Indexing</h2><p>Define the index ranges (start and end points) corresponding to each region within the overall combined numerical grid. Ia, Ib define radial index ranges. Ja, Jb define axial index ranges. Example assumes 2 radial regions stacked axially (same axial range).</p><pre class="codeinput">Ia = [1, nr(1)];         <span class="comment">% Radial indices for region 1</span>
+Ib = [nr(1), nrA];       <span class="comment">% Radial indices for region 2 (starts at the interface node)</span>
+Ja = [1, 1];             <span class="comment">% Axial indices for region 1 (assuming starts at index 1)</span>
+Jb = [nzA, nzA];         <span class="comment">% Axial indices for region 2 (assuming ends at index nzA for both)</span>
 
-<span class="comment">%extension to the full block</span>
-ddr0A=cell(1,Nblock);
-ddrr0A=cell(1,Nblock);
-ddz0A=cell(1,Nblock);
-ddzz0A=cell(1,Nblock);
+<span class="comment">% &lt;html&gt;</span>
+<span class="comment">% &lt;object type="image/svg+xml" data="grid.svg" width="400" height="300"&gt; &lt;/object&gt;</span>
+<span class="comment">% &lt;/html&gt;</span>
+<span class="comment">%</span>
+</pre><h2 id="6">Extend Regional Matrices to Full Domain (Sparse Embedding)</h2><p>Extend the individual "regional" differentiation matrices to operate on the entire computational domain by embedding them into larger identity matrices. This prepares them for assembly into global operators.</p><pre class="codeinput">ddr0A  = cell(1, NRegion); <span class="comment">% First radial derivative</span>
+ddrr0A = cell(1, NRegion); <span class="comment">% Second radial derivative</span>
+ddz0A  = cell(1, NRegion); <span class="comment">% First axial derivative</span>
+ddzz0A = cell(1, NRegion); <span class="comment">% Second axial derivative</span>
 
-<span class="keyword">for</span> i=1:Nblock
-ddr0A{i}=eye(nrA,nrA);
-ddr0A{i}(Ia(i):Ib(i), Ia(i):Ib(i)) = dr0A{i};
-ddrr0A{i}=eye(nrA,nrA);
-ddrr0A{i}(Ia(i):Ib(i), Ia(i):Ib(i)) = drr0A{i};
 
-ddz0A{i}=eye(nzA,nzA);
-ddz0A{i}(Ja(i):Jb(i), Ja(i):Jb(i)) = dz0A{i};
-ddzz0A{i}=eye(nrA,nrA);
-ddzz0A{i}(Ja(i):Jb(i), Ja(i):Jb(i)) = dzz0A{i};
+<span class="keyword">for</span> i=1:NRegion
+    ddr0A{i}=eye(nrA,nrA);
+    ddrr0A{i}=eye(nrA,nrA);
+    ddz0A{i}=eye(nzA,nzA);
+    ddzz0A{i}=eye(nzA,nzA);
+
+    ddr0A{i}(Ia(i):Ib(i), Ia(i):Ib(i)) = dr0A{i};
+    ddrr0A{i}(Ia(i):Ib(i), Ia(i):Ib(i)) = drr0A{i};
+    ddz0A{i}(Ja(i):Jb(i), Ja(i):Jb(i)) = dz0A{i};
+    ddzz0A{i}(Ja(i):Jb(i), Ja(i):Jb(i)) = dzz0A{i};
 <span class="keyword">end</span>
-
-
-
-<span class="comment">% Masking for blocks</span>
-mask = cell(Nblock, 1);
-<span class="keyword">for</span> k = 1:Nblock
+</pre><h2 id="7">Create Masks and Global Operators using Kronecker Products</h2><p>Create masks to ensure that derivatives calculated for one region only use function values from within that same region. Derivatives in one region should not depend on values in neighboring regions at this stage (coupling happens later via boundary/interface conditions).</p><pre class="codeinput">mask = cell(NRegion, 1);
+<span class="keyword">for</span> k = 1:NRegion
     mask{k} = zeros(nrA, nzA);
     mask{k}(Ia(k):Ib(k), Ja(k):Jb(k)) = 1; <span class="comment">% Set block region</span>
 <span class="keyword">end</span>
+</pre><p>Construct the full-domain differentiation matrices (sparse) for each region using Kronecker products (kron) and the masks. The resulting matrices operate on vectors where unknowns are ordered column-wise (fastest index is radial).</p><pre class="codeinput">ntA = nrA * nzA; <span class="comment">% Total number of points in the combined grid</span>
+Iz = speye(nzA); <span class="comment">% Sparse identity matrix for axial dimension</span>
+Ir = speye(nrA); <span class="comment">% Sparse identity matrix for radial dimension</span>
 
-<span class="comment">% Full domain matrices</span>
-ntA = nrA * nzA;
-Iz = speye(nzA); Ir = speye(nrA);
-<span class="keyword">for</span> k = 1:Nblock
+<span class="keyword">for</span> k = 1:NRegion
+    <span class="comment">% Reshape mask to a column vector matching the vectorized grid ordering</span>
     c = reshape(mask{k}, ntA, 1);
-    ddz0A{k} = spdiags(c, 0, ntA, ntA) * kron(ddz0A{k}, Ir); <span class="comment">% Axial derivatives</span>
-    ddzz0A{k} = spdiags(c, 0, ntA, ntA) * kron(ddzz0A{k}, Ir);
-    ddr0A{k} = spdiags(c, 0, ntA, ntA) * kron(Iz, ddr0A{k}); <span class="comment">% Radial derivatives</span>
-    ddrr0A{k} = spdiags(c, 0, ntA, ntA) * kron(Iz, ddrr0A{k});
-<span class="keyword">end</span>
-</pre>
-<pre class="codeinput">
-<span class="keyword">end</span>
-</pre>
-<p class="footer">
-<br>
-<a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2023b</a>
-<br>
-</p>
-</div>
-<!--
-##### SOURCE BEGIN #####
-function [r0A, z0A, nrA, nzA, ddr0A, ddrr0A, ddz0A, ddzz0A, Ia, Ib, Ja, Jb] = ...
-    collocationmatrices2th(nr, nz, Nblock, alphar)
-%% Generate collocation matrices for 2D domain
+    <span class="comment">% Create sparse diagonal matrix from the mask vector</span>
+    MaskDiag = spdiags(c, 0, ntA, ntA);
 
+    <span class="comment">% Apply mask to the Kronecker product to zero out contributions outside region 'k'</span>
+    <span class="comment">% kron(ddz0A{k}, Ir) creates the axial derivative operator for the full grid</span>
+    ddz0A{k}  = MaskDiag * kron(ddz0A{k}, Ir);  <span class="comment">% First axial derivative</span>
+    ddzz0A{k} = MaskDiag * kron(ddzz0A{k}, Ir); <span class="comment">% Second axial derivative</span>
+    <span class="comment">% kron(Iz, ddr0A{k}) creates the radial derivative operator for the full grid</span>
+    ddr0A{k}  = MaskDiag * kron(Iz, ddr0A{k});  <span class="comment">% First radial derivative</span>
+    ddrr0A{k} = MaskDiag * kron(Iz, ddrr0A{k}); <span class="comment">% Second radial derivative</span>
+<span class="keyword">end</span>
+</pre><p>The full domain matrices of each domain are created. ntA = nrA * nzA; Iz = speye(nzA); Ir = speye(nrA); for k = 1:NRegion     c = reshape(mask{k}, ntA, 1);     ddz0A{k} = spdiags(c, 0, ntA, ntA) * kron(ddz0A{k}, Ir); % Axial derivatives     ddzz0A{k} = spdiags(c, 0, ntA, ntA) * kron(ddzz0A{k}, Ir);     ddr0A{k} = spdiags(c, 0, ntA, ntA) * kron(Iz, ddr0A{k}); % Radial derivatives     ddrr0A{k} = spdiags(c, 0, ntA, ntA) * kron(Iz, ddrr0A{k}); end</p><pre class="codeinput"><span class="keyword">end</span> <span class="comment">% End of function collocationmatrices2th</span>
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2022b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Generate collocation matrices for 2D domain
+% function to set the numerical collocation matrices.
+
+
+function [r0A, z0A, nrA, nzA, ddr0A, ddrr0A, ddz0A, ddzz0A, Ia, Ib, Ja, Jb] = ...
+    collocationmatrices2th(nr, nz, NRegion)
+
+%
+% First we compute the total number on nodes in radial and axial direction 
 nrA = nr(1) + nr(2) - 1; % Total radial points
 nzA = nz(1); % Total axial points
-
-% Radial collocation matrices
+%% 1D Differentiation Matrices
+% Compute the 1D collocation differentiation matrices for the radial direction of each region.
+% This allows the radial numerical derivative of a function 'v' at node 'i'
+% to be computed from the array of node values 'v_j' using the formula:
+% 
+% $$ \partial_r v|_i = \sum dr0A_{ij} \: v_j $$ 
+%
+% In the radial direction, a Chebyshev approximation is used.
+% A transformation (tanh mapping, specifically Chevitanh/Chevitanh_inverse) is applied
+% to cluster nodes near one of the domain boundaries (r=-1, r=0, r=1). This clustering
+% helps capture boundary layer effects or sharp gradients.
+alphar = 3.;
 [r0A1, dr0A{1}, drr0A{1}] = Chevitanh(nr(1)-1, -1, 0, alphar); % Lower block
 [r0A2, dr0A{2}, drr0A{2}] = Chevitanh_inverse(nr(2)-1, 0, 1, alphar); % Upper block
 r0A = [r0A1(1:nr(1)), r0A2(2:nr(2))]; % Combined radial coordinates
 
-% Axial collocation matrices
+%%
+% In the axial direction, a second-order finite difference approximation is used.
 [z0A, dz0A{1}, dzz0A{1}] = finites2thsparse(nz(1), 1); % Axial matrices
 [z0A, dz0A{2}, dzz0A{2}] = finites2thsparse(nz(2), 1); % Axial matrices
-% Block indices
-Ia = [1, nr(1)]; Ib = [nr(1), nrA]; Ja = [1, 1]; Jb = [nzA, nzA];
 
-%extension to the full block
-ddr0A=cell(1,Nblock);
-ddrr0A=cell(1,Nblock);
-ddz0A=cell(1,Nblock);
-ddzz0A=cell(1,Nblock);
+%% Region Indexing
+% Define the index ranges (start and end points) corresponding to each
+% region within the overall combined numerical grid.
+% Ia, Ib define radial index ranges. Ja, Jb define axial index ranges.
+% Example assumes 2 radial regions stacked axially (same axial range).
+Ia = [1, nr(1)];         % Radial indices for region 1
+Ib = [nr(1), nrA];       % Radial indices for region 2 (starts at the interface node)
+Ja = [1, 1];             % Axial indices for region 1 (assuming starts at index 1)
+Jb = [nzA, nzA];         % Axial indices for region 2 (assuming ends at index nzA for both)
 
-for i=1:Nblock
-ddr0A{i}=eye(nrA,nrA);
-ddr0A{i}(Ia(i):Ib(i), Ia(i):Ib(i)) = dr0A{i};
-ddrr0A{i}=eye(nrA,nrA);
-ddrr0A{i}(Ia(i):Ib(i), Ia(i):Ib(i)) = drr0A{i};
+% <html>
+% <object type="image/svg+xml" data="grid.svg" width="400" height="300"> </object>
+% </html>
+%
 
-ddz0A{i}=eye(nzA,nzA);
-ddz0A{i}(Ja(i):Jb(i), Ja(i):Jb(i)) = dz0A{i};
-ddzz0A{i}=eye(nrA,nrA);
-ddzz0A{i}(Ja(i):Jb(i), Ja(i):Jb(i)) = dzz0A{i};
+%% Extend Regional Matrices to Full Domain (Sparse Embedding)
+% Extend the individual "regional" differentiation matrices to operate on the
+% entire computational domain by embedding them into larger identity matrices.
+% This prepares them for assembly into global operators.
+ddr0A  = cell(1, NRegion); % First radial derivative
+ddrr0A = cell(1, NRegion); % Second radial derivative
+ddz0A  = cell(1, NRegion); % First axial derivative
+ddzz0A = cell(1, NRegion); % Second axial derivative
+
+
+for i=1:NRegion
+    ddr0A{i}=eye(nrA,nrA);
+    ddrr0A{i}=eye(nrA,nrA);
+    ddz0A{i}=eye(nzA,nzA);
+    ddzz0A{i}=eye(nzA,nzA);
+  
+    ddr0A{i}(Ia(i):Ib(i), Ia(i):Ib(i)) = dr0A{i};
+    ddrr0A{i}(Ia(i):Ib(i), Ia(i):Ib(i)) = drr0A{i};
+    ddz0A{i}(Ja(i):Jb(i), Ja(i):Jb(i)) = dz0A{i};
+    ddzz0A{i}(Ja(i):Jb(i), Ja(i):Jb(i)) = dzz0A{i};
 end
 
+%% Create Masks and Global Operators using Kronecker Products
+% Create masks to ensure that derivatives calculated for one region
+% only use function values from within that same region. Derivatives
+% in one region should not depend on values in neighboring regions
+% at this stage (coupling happens later via boundary/interface conditions).
 
-
-% Masking for blocks
-mask = cell(Nblock, 1);
-for k = 1:Nblock
+mask = cell(NRegion, 1);
+for k = 1:NRegion
     mask{k} = zeros(nrA, nzA);
     mask{k}(Ia(k):Ib(k), Ja(k):Jb(k)) = 1; % Set block region
 end
 
-% Full domain matrices
-ntA = nrA * nzA;
-Iz = speye(nzA); Ir = speye(nrA);
-for k = 1:Nblock
+%%
+% Construct the full-domain differentiation matrices (sparse) for each region
+% using Kronecker products (kron) and the masks.
+% The resulting matrices operate on vectors where unknowns are ordered column-wise (fastest index is radial).
+ntA = nrA * nzA; % Total number of points in the combined grid
+Iz = speye(nzA); % Sparse identity matrix for axial dimension
+Ir = speye(nrA); % Sparse identity matrix for radial dimension
+
+for k = 1:NRegion
+    % Reshape mask to a column vector matching the vectorized grid ordering
     c = reshape(mask{k}, ntA, 1);
-    ddz0A{k} = spdiags(c, 0, ntA, ntA) * kron(ddz0A{k}, Ir); % Axial derivatives
-    ddzz0A{k} = spdiags(c, 0, ntA, ntA) * kron(ddzz0A{k}, Ir);
-    ddr0A{k} = spdiags(c, 0, ntA, ntA) * kron(Iz, ddr0A{k}); % Radial derivatives
-    ddrr0A{k} = spdiags(c, 0, ntA, ntA) * kron(Iz, ddrr0A{k});
+    % Create sparse diagonal matrix from the mask vector
+    MaskDiag = spdiags(c, 0, ntA, ntA);
+
+    % Apply mask to the Kronecker product to zero out contributions outside region 'k'
+    % kron(ddz0A{k}, Ir) creates the axial derivative operator for the full grid
+    ddz0A{k}  = MaskDiag * kron(ddz0A{k}, Ir);  % First axial derivative
+    ddzz0A{k} = MaskDiag * kron(ddzz0A{k}, Ir); % Second axial derivative
+    % kron(Iz, ddr0A{k}) creates the radial derivative operator for the full grid
+    ddr0A{k}  = MaskDiag * kron(Iz, ddr0A{k});  % First radial derivative
+    ddrr0A{k} = MaskDiag * kron(Iz, ddrr0A{k}); % Second radial derivative
 end
-end
+
+%%
+% The full domain matrices of each domain are created.
+% ntA = nrA * nzA;
+% Iz = speye(nzA); Ir = speye(nrA);
+% for k = 1:NRegion
+%     c = reshape(mask{k}, ntA, 1);
+%     ddz0A{k} = spdiags(c, 0, ntA, ntA) * kron(ddz0A{k}, Ir); % Axial derivatives
+%     ddzz0A{k} = spdiags(c, 0, ntA, ntA) * kron(ddzz0A{k}, Ir);
+%     ddr0A{k} = spdiags(c, 0, ntA, ntA) * kron(Iz, ddr0A{k}); % Radial derivatives
+%     ddrr0A{k} = spdiags(c, 0, ntA, ntA) * kron(Iz, ddrr0A{k});
+% end
+
+end % End of function collocationmatrices2th
+
 ##### SOURCE END #####
--->
-</body>
-</html>
+--></body></html>
